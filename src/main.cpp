@@ -1,5 +1,5 @@
-#include "collcontrol.h"
-#include <GLFW/glfw3.h>
+#include "collcontrol.hpp"
+#include "vertices.hpp"
 
 void enable_if_debug();
 void shutdown(GLFWwindow*);
@@ -7,13 +7,19 @@ void shutdown(GLFWwindow*);
 int main() {
    GLFWwindow *window = init_window(500, 500);
    enable_if_debug();
-   
+  
+   Vertex vertx;
+
+   Shader shd("shaders/default.vert", "shader/default.frag");
+   vertx.create_VBO(vertices::triangle, sizeof(vertices::triangle));
+   vertx.add_atrib(0, 3, GL_FLOAT, GL_FALSE, 0);
+
    while (!glfwWindowShouldClose(window)){
-      glfwPollEvents();
       glfwSetKeyCallback(window, key_callback);
+      glfwPollEvents();
 
-      /*TODO: draw(); */
-
+      shd.use();
+      vertx.draw_VBO(GL_TRIANGLES, 3);
       glClearBufferfv(GL_COLOR, 0, color::blue);
       glfwSwapBuffers(window);
    }

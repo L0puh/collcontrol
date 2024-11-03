@@ -1,5 +1,6 @@
-#include "collcontrol.h"
+#include "collcontrol.hpp"
 #include <GLFW/glfw3.h>
+#include <cstdlib>
 
 GLFWwindow* init_window(int width, int height){
    GLFWwindow* window;
@@ -12,8 +13,13 @@ GLFWwindow* init_window(int width, int height){
    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
    window = glfwCreateWindow(width, height, "window", 0, 0);
-   if (window == NULL) error_and_exit("window init failed");
-  
+   if (window == NULL) {
+     printf("[-] error[%s:%s:%d]: %s\n",
+            "/home/lopuh/code/collcontrol/src/window.cpp", __func__, 16,
+            "window init failed");
+     exit(-1);
+   };
+
    glfwMakeContextCurrent(window);
    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) 
       error_and_exit("glad load failed");
