@@ -9,19 +9,19 @@ int main() {
    enable_if_debug();
   
    Vertex vertx;
-
-   Shader shd("shaders/default.vert", "shader/default.frag");
+   Shader shd("shaders/default.vert", "shaders/default.frag");
    vertx.create_VBO(vertices::triangle, sizeof(vertices::triangle));
    vertx.add_atrib(0, 3, GL_FLOAT, GL_FALSE, 0);
 
    while (!glfwWindowShouldClose(window)){
-      glfwSetKeyCallback(window, key_callback);
-      glfwPollEvents();
-
+      glClearBufferfv(GL_COLOR, 0, color::blue);
+      
       shd.use();
       vertx.draw_VBO(GL_TRIANGLES, 3);
-      glClearBufferfv(GL_COLOR, 0, color::blue);
+
+      glfwSetKeyCallback(window, key_callback);
       glfwSwapBuffers(window);
+      glfwPollEvents();
    }
    
    shutdown(window);

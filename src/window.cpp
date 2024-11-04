@@ -36,7 +36,8 @@ void debug_message_callback(GLenum src, GLenum type,
                       const GLchar* msg, const GLvoid* parm)
 {
    if (type == GL_DEBUG_TYPE_ERROR){
-      error_and_exit(msg);
+      printf("[-] error (debug) [%d]: %s\n", type, msg);
+      exit(-1);
    }
 }
 

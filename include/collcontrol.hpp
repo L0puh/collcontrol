@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <unordered_map>
 
-#define error_and_exit(msg) { printf("[-] error[%s:%s:%d]: %s\n", __FILE__, __func__, __LINE__, msg); exit(-1);}
+#define error_and_exit(msg) { printf("[-] error[%s:%s:%d]%s\n", __FILE__, __func__, __LINE__, msg); exit(-1);}
 #ifdef DEBUG_MODE
 #define log_info(msg) {printf("[+] INFO [%s:%d]: %s\n", __func__, __LINE__, msg);}
 #else
@@ -55,11 +55,11 @@ class Shader {
       ~Shader();
 
    public:
-      void compile(uint *shader, char* src, GLenum type);
+      void compile(uint *shader, std::string src, GLenum type);
       void link(uint vrt, uint frag);
 
       void cleanup();
-      void load_src();
+      std::string load_src(std::string&);
 
       const uint get_id() { return id; }
       const int get_location(char* name);
