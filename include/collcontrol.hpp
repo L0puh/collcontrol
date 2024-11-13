@@ -7,6 +7,7 @@
 #include <string>
 #include <sys/types.h>
 #include <unordered_map>
+#include <glm/mat4x4.hpp>
 
 #define error_and_exit(msg) { printf("[-] error[%s:%s:%d]%s\n", __FILE__, __func__, __LINE__, msg); exit(-1);}
 #ifdef DEBUG_MODE
@@ -66,6 +67,38 @@ class Shader {
       
       void use()    { glUseProgram(id); }
       void unuse()  { glUseProgram(0);  }
+};
+
+class Shape {
+};
+
+class Object {
+   public:
+      Shader *shader;
+      Shape  *shape;
+      glm::vec3 pos, size, color;
+      glm::mat4 model, view, proj;
+
+   public:
+      Object(Shader *shader, Shape *shape): shader(shader), shape(shape) {};
+      ~Object();
+
+   public:
+      
+      void set_pos(glm::vec3 pos);
+      void set_color(glm::vec3 color);
+      void set_size(glm::vec3 size);
+      void set_rotation(float angle, glm::vec3 pos);
+      
+      void update() { model = glm::mat4(1.0f); }
+      void draw();
+
+   private: 
+
+      void scale(glm::vec3 scaler);
+      void translate(glm::vec3 pos);
+      void rotate(float angle, glm::vec3 pos);
+
 };
 
 
