@@ -4,8 +4,8 @@ void Object::draw() {
    
    update();
    translate(pos);
-   rotate(angle, rotation_pos);
    scale(size);
+   rotate(angle, rotation_pos);
    
    shader->use();
 

@@ -141,7 +141,7 @@ class Object {
          this->angle = angle;
          this->rotation_pos = pos;
       }
-      void set_color(float color[4]) { 
+      void set_color(const GLfloat *color) { 
          this->color = glm::vec3(color[0], color[1], color[2]); 
       }
       

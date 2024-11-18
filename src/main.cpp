@@ -24,8 +24,8 @@ int main() {
    Object obj(&shd, &shape);
    obj.set_color(color::red);
    obj.set_size(glm::vec3(1.0f, 1.0f, 0.0f));
-   obj.set_pos(glm::vec3(0.1, 0.5, 0.0f));
-   obj.set_rotation(glm::radians(90.0f),  glm::vec3(0.0f, 0.0f, 1.0f));
+   obj.set_pos(glm::vec3(0.5, 0.5, 0.0f));
+   obj.set_rotation(glm::radians(180.0f),  glm::vec3(0.0f, 0.0f, 1.0f));
 
    while (!glfwWindowShouldClose(window)){
       glClearBufferfv(GL_COLOR, 0, color::blue);
