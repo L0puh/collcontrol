@@ -1,5 +1,8 @@
 #include "collcontrol.hpp"
+#include "glm/detail/qualifier.hpp"
+#include "glm/trigonometric.hpp"
 #include "vertices.hpp"
+#include <GLFW/glfw3.h>
 
 void enable_if_debug();
 void shutdown(GLFWwindow*);
@@ -12,12 +15,22 @@ int main() {
    Shader shd("shaders/default.vert", "shaders/default.frag");
    vertx.create_VBO(vertices::triangle, sizeof(vertices::triangle));
    vertx.add_atrib(0, 3, GL_FLOAT, GL_FALSE, 0);
+   
+   Shape shape(&vertx);
+   shape.set_mode(GL_TRIANGLES);
+   shape.set_size(LEN(vertices::triangle));
+   shape.set_shape(shape_type::triangle);
+   
+   Object obj(&shd, &shape);
+   obj.set_color(color::red);
+   obj.set_size(glm::vec3(1.0f, 1.0f, 0.0f));
+   obj.set_pos(glm::vec3(0.1, 0.5, 0.0f));
+   obj.set_rotation(glm::radians(90.0f),  glm::vec3(0.0f, 0.0f, 1.0f));
 
    while (!glfwWindowShouldClose(window)){
       glClearBufferfv(GL_COLOR, 0, color::blue);
-      
-      shd.use();
-      vertx.draw_VBO(GL_TRIANGLES, 3);
+
+      obj.draw();
 
       glfwSetKeyCallback(window, key_callback);
       glfwSwapBuffers(window);

@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <sys/types.h>
 #include <unordered_map>
@@ -15,6 +16,8 @@
 #else
 #define log(msg) {}
 #endif
+
+#define LEN(n) sizeof(n)/sizeof(n[0])
 
 namespace color {
    const GLfloat blue[]   = {0.0f, 0.0f, 1.0f, 1.0f};
@@ -31,6 +34,8 @@ class Vertex {
    public:
       Vertex()  { VAO = create_VAO(); }
       ~Vertex() { cleanup(); }
+   public:
+      bool with_EBO = false;
    public:
       int create_VAO();
       int create_EBO(const void* data, size_t);
@@ -63,32 +68,82 @@ class Shader {
       std::string load_src(std::string&);
 
       const uint get_id() { return id; }
-      const int get_location(char* name);
+      const int get_location(std::string name);
       
       void use()    { glUseProgram(id); }
       void unuse()  { glUseProgram(0);  }
+
+      void set_mat4fv(std::string location, glm::mat4x4 mat) { 
+         glUniformMatrix4fv(get_location(location), 1, GL_FALSE, glm::value_ptr(mat));
+      }
+      void set_vec3(std::string location, glm::vec3 vec){
+         glUniform3f(get_location(location), vec.x, vec.y, vec.z);
+      }
 };
 
+typedef enum {
+   triangle,
+   square,
+   circle
+
+} shape_type;
+
 class Shape {
+   public:
+      uint size;
+      GLenum mode;
+      Vertex* vertex;
+      shape_type shape; 
+
+   public:
+      Shape(Vertex *vertex): vertex(vertex) {};
+      ~Shape() {};
+
+   public:
+
+      void set_size(uint s)        { size = s; }
+      void set_mode(GLenum m)      { mode = m; }
+      void set_shape(shape_type t) { shape = t;}
+
+      void draw(){
+         if (vertex->with_EBO){
+            vertex->bind();
+            vertex->draw_EBO(mode, size);
+            vertex->unbind();
+         } else {
+            vertex->bind();
+            vertex->draw_VBO(mode, size);
+            vertex->unbind();
+         }
+      }
 };
+
 
 class Object {
    public:
       Shader *shader;
       Shape  *shape;
-      glm::vec3 pos, size, color;
+      
+      float angle = 0.0f;
       glm::mat4 model, view, proj;
+      glm::vec3 pos, size, color, rotation_pos;
+
 
    public:
       Object(Shader *shader, Shape *shape): shader(shader), shape(shape) {};
-      ~Object();
+      ~Object() {};
 
    public:
       
-      void set_pos(glm::vec3 pos);
-      void set_color(glm::vec3 color);
-      void set_size(glm::vec3 size);
-      void set_rotation(float angle, glm::vec3 pos);
+      void set_pos(glm::vec3 pos) { this->pos = pos; }
+      void set_size(glm::vec3 size) { this->size = size; }
+      void set_rotation(float angle, glm::vec3 pos) { 
+         this->angle = angle;
+         this->rotation_pos = pos;
+      }
+      void set_color(float color[4]) { 
+         this->color = glm::vec3(color[0], color[1], color[2]); 
+      }
       
       void update() { model = glm::mat4(1.0f); }
       void draw();

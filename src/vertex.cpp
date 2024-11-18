@@ -30,6 +30,8 @@ int Vertex::create_EBO(const void* data, size_t size){
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 
+   with_EBO = true;
+
    return EBO;
 }
 
@@ -41,7 +43,6 @@ int Vertex::draw_EBO(GLenum mode, size_t size){
    return 0;
 }
 int Vertex::draw_VBO(GLenum mode, size_t size){
-
    bind();
    glDrawArrays(mode, 0, size);
    unbind();

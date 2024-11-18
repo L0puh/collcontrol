@@ -1,4 +1,5 @@
 #include "collcontrol.hpp"
+#include "glm/ext/matrix_transform.hpp"
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -86,13 +87,25 @@ void Shader::cleanup() {
    glDeleteProgram(id);
 }
 
-const int Shader::get_location(char* name){
+const int Shader::get_location(std::string name){
    int location;
    if (cached_locations[name]) 
       return cached_locations[name];
-   location = glGetUniformLocation(id, name);
+   location = glGetUniformLocation(id, name.c_str());
    if (location == -1) 
-      error_and_exit(name);
+      error_and_exit(name.c_str());
    cached_locations[name] = location;
    return location;
+}
+
+
+
+void Object::scale(glm::vec3 scaler){
+   model = glm::scale(model, scaler);
+}
+void Object::translate(glm::vec3 pos){
+   model = glm::translate(model, pos);
+}
+void Object::rotate(float angle, glm::vec3 pos){
+   model = glm::rotate(model, angle, pos);
 }
