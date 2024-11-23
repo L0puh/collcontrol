@@ -1,6 +1,6 @@
 #include "collcontrol.hpp"
 
-void Object::draw() {
+void Object::draw(glm::mat4 proj, glm::mat4 view) {
    
    update();
    translate(pos);
@@ -8,8 +8,6 @@ void Object::draw() {
    rotate(angle, rotation_pos);
    
    shader->use();
-
-   proj = view = model;
 
    shader->set_mat4fv("_projection", proj);
    shader->set_mat4fv("_view", view);
@@ -19,3 +17,5 @@ void Object::draw() {
    shape->draw();
    shader->unuse();
 }
+
+

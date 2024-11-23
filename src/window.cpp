@@ -2,6 +2,11 @@
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 
+
+void frame_buffer_size(GLFWwindow* wind, int width, int height){
+   glViewport(0, 0, width, height);
+}
+
 GLFWwindow* init_window(int width, int height){
    GLFWwindow* window;
 
@@ -24,8 +29,7 @@ GLFWwindow* init_window(int width, int height){
    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) 
       error_and_exit("glad load failed");
 
-   //TODO: glfwSetFramebufferSizeCallback(window, frame_buffer_size);
-
+   glfwSetFramebufferSizeCallback(window, frame_buffer_size);
    log_info("init window");
    return window;
 }
