@@ -30,7 +30,7 @@ int Vertex::create_EBO(const void* data, size_t size){
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 
-   with_EBO = true;
+   this->with_EBO = true;
 
    return EBO;
 }
@@ -49,12 +49,12 @@ int Vertex::draw_VBO(GLenum mode, size_t size){
    return 0;
 }
 
-void Vertex::add_atrib(uint id, GLint size, GLenum type,
-                      GLboolean norm, GLsizei stride)
+void Vertex::add_atrib(uint id, GLint size, GLenum type)
 {
    bind();
    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-   glVertexAttribPointer(id, size, type, norm, stride, (void*) (size * sizeof(float)));
+   //FIXME: caclulate the proper offset 
+   glVertexAttribPointer(id, size, type, GL_FALSE, (size * sizeof(float)), (void*)0);
    glEnableVertexAttribArray(id);
    unbind();
 }

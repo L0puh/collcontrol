@@ -1,5 +1,6 @@
 #include "collcontrol.hpp"
 #include "vertices.hpp"
+
 #include <GLFW/glfw3.h>
 #include <cmath>
 
@@ -14,17 +15,17 @@ int main() {
    
    Vertex vertx;
    Camera camera(window, 0);
+
    vertx.create_VBO(vertices::triangle, sizeof(vertices::triangle));
-   vertx.add_atrib(0, 3, GL_FLOAT, GL_FALSE, 0);
+   // vertx.create_EBO(indices::square, sizeof(indices::square));
+   vertx.add_atrib(0, 3, GL_FLOAT);
    
    Shape shape(&vertx);
-   shape.set_mode(GL_TRIANGLES);
-   shape.set_size(LEN(vertices::triangle));
    shape.set_shape(shape_type::triangle);
    
    Object obj(&shd, &shape);
    obj.set_color(color::red);
-   obj.set_size(glm::vec3(1.0f, 1.0f, 0.0f));
+   obj.set_size(glm::vec3(2.0f, 2.0f, 1.0f));
    obj.set_pos(glm::vec3(0.5, 0.5, 0.0f));
    obj.set_rotation(glm::radians(180.0f),  glm::vec3(0.0f, 0.0f, 1.0f));
 

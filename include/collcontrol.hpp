@@ -1,7 +1,6 @@
 #ifndef COLLCONTROL
 #define COLLCONTROL 
 
-#include "glm/ext/matrix_transform.hpp"
 #include <cstdio>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -10,6 +9,8 @@
 #include <sys/types.h>
 #include <unordered_map>
 #include <glm/mat4x4.hpp>
+
+#include "vertices.hpp"
 
 #define error_and_exit(msg) { printf("[-] error[%s:%s:%d]%s\n", __FILE__, __func__, __LINE__, msg); exit(-1);}
 #ifdef DEBUG_MODE
@@ -45,8 +46,7 @@ class Vertex {
       void bind()   { glBindVertexArray(VAO);}
       void unbind() { glBindVertexArray(0);  }
       
-      void add_atrib(uint id, GLint size, GLenum type,
-                      GLboolean norm, GLsizei stride); 
+      void add_atrib(uint id, GLint size, GLenum type);
       int draw_EBO(GLenum mode, size_t size);
       int draw_VBO(GLenum mode, size_t size);
       int cleanup();
@@ -83,8 +83,8 @@ class Shader {
 };
 
 typedef enum {
-   triangle,
    square,
+   triangle,
    circle
 
 } shape_type;
@@ -92,19 +92,31 @@ typedef enum {
 class Shape {
    public:
       uint size;
-      GLenum mode;
       Vertex* vertex;
       shape_type shape; 
+      GLenum mode = GL_TRIANGLES;
 
    public:
-      Shape(Vertex *vertex): vertex(vertex) {};
+      Shape(Vertex *vertex): vertex(vertex){ 
+      };
       ~Shape() {};
 
    public:
-
+      
       void set_size(uint s)        { size = s; }
       void set_mode(GLenum m)      { mode = m; }
-      void set_shape(shape_type t) { shape = t;}
+      void set_shape(shape_type t) { 
+         shape = t;
+         switch(shape){
+            case shape_type::triangle:
+               size = LEN(vertices::triangle);
+               break;
+            case shape_type::square:
+            case shape_type::circle:
+               size = LEN(vertices::square);
+              break;
+         }
+      }
 
       void draw(){
          if (vertex->with_EBO){
@@ -116,7 +128,7 @@ class Shape {
             vertex->draw_VBO(mode, size);
             vertex->unbind();
          }
-      }
+   }
 };
 
 //TODO:
