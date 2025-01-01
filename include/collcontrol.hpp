@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <glm/mat4x4.hpp>
 
+#include "state.hpp"
 #include "vertices.hpp"
 
 #define error_and_exit(msg) { printf("[-] error[%s:%s:%d]%s\n", __FILE__, __func__, __LINE__, msg); exit(-1);}
@@ -20,6 +21,7 @@
 #endif
 
 #define LEN(n) sizeof(n)/sizeof(n[0])
+
 
 namespace color {
    const GLfloat blue[]   = {0.0f, 0.0f, 1.0f, 1.0f};
@@ -58,12 +60,14 @@ class Shader {
       std::unordered_map<std::string, uint> cached_locations;
 
    public:
+      Shader() {};
       Shader(std::string vert_src, std::string frag_src);
       ~Shader();
 
    public:
       void compile(uint *shader, std::string src, GLenum type);
       void link(uint vrt, uint frag);
+      void init_shader(std::string vert_src, std::string frag_src);
 
       void cleanup();
       std::string load_src(std::string&);
@@ -80,6 +84,12 @@ class Shader {
       void set_vec3(std::string location, glm::vec3 vec){
          glUniform3f(get_location(location), vec.x, vec.y, vec.z);
       }
+      void set_vec2(std::string location, glm::vec2 vec){
+         glUniform2f(get_location(location), vec.x, vec.y);
+      }
+      void set_float(std::string location, float x){
+         glUniform1f(get_location(location), x);
+      }
 };
 
 typedef enum {
@@ -92,17 +102,42 @@ typedef enum {
 class Shape {
    public:
       uint size;
-      Vertex* vertex;
+      Vertex vertex;
       shape_type shape; 
       GLenum mode = GL_TRIANGLES;
+      Shader shader;
+      glm::vec2 center;
+      float radius;
 
    public:
-      Shape(Vertex *vertex): vertex(vertex){ 
+      Shape(shape_type type, glm::vec2 center=glm::vec2(0.2f), float radius=1.4f): 
+         shape(type), center(center), radius(radius)
+      {
+         set_shape(type);
+         switch(type){
+            case circle:
+               shader.init_shader("shaders/circle.vert", "shaders/circle.frag");
+               vertex.create_VBO(vertices::square, sizeof(vertices::square));
+               vertex.create_EBO(indices::square, sizeof(indices::square));
+               vertex.add_atrib(0, 3, GL_FLOAT);
+               break;
+            case square:
+               shader.init_shader("shaders/default.vert", "shaders/default.frag");
+               vertex.create_VBO(vertices::square, sizeof(vertices::square));
+               vertex.create_EBO(indices::square, sizeof(indices::square));
+               vertex.add_atrib(0, 3, GL_FLOAT);
+               break;
+            case triangle:
+               shader.init_shader("shaders/default.vert", "shaders/default.frag");
+               vertex.create_VBO(vertices::triangle, sizeof(vertices::triangle));
+               vertex.add_atrib(0, 3, GL_FLOAT);
+               break;
+         }
+
       };
-      ~Shape() {};
+      ~Shape(){};
 
    public:
-      
       void set_size(uint s)        { size = s; }
       void set_mode(GLenum m)      { mode = m; }
       void set_shape(shape_type t) { 
@@ -119,19 +154,18 @@ class Shape {
       }
 
       void draw(){
-         if (vertex->with_EBO){
-            vertex->bind();
-            vertex->draw_EBO(mode, size);
-            vertex->unbind();
+         if (vertex.with_EBO){
+            vertex.bind();
+            vertex.draw_EBO(mode, size);
+            vertex.unbind();
          } else {
-            vertex->bind();
-            vertex->draw_VBO(mode, size);
-            vertex->unbind();
+            vertex.bind();
+            vertex.draw_VBO(mode, size);
+            vertex.unbind();
          }
    }
 };
 
-//TODO:
 class Camera {
    public:
       GLFWwindow* window;
@@ -146,6 +180,7 @@ class Camera {
          speed(1.2f), rotation_speed(1.2f), rotation(0.0f), 
          is_3D(is_3D), view(glm::mat4(1.0f)), pos(glm::vec3(0.0f)){}
    public:
+      glm::vec2 get_window_size(){ return glm::vec2(window_width, window_height); }
       void update(){ 
          view = glm::mat4(1.0f);
          view = glm::translate(view, pos);
@@ -168,7 +203,7 @@ class Object {
 
 
    public:
-      Object(Shader *shader, Shape *shape): shader(shader), shape(shape) {};
+      Object(Shape *shape): shader(&shape->shader), shape(shape) {};
       ~Object() {};
 
    public:
@@ -194,7 +229,13 @@ class Object {
 
 };
 
+namespace imgui {
+   void init(GLFWwindow* window);
+   void frame();
+   void render();
+   void draw_main();
 
+}
 
 void debug_message_callback (GLenum, GLenum, GLuint, GLuint,
                             GLsizei, const GLchar*, const GLvoid*);

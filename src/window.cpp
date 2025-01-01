@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 
+STATE state;
 
 void frame_buffer_size(GLFWwindow* wind, int width, int height){
    glViewport(0, 0, width, height);

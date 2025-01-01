@@ -5,6 +5,9 @@
 #include <sstream>
 
 Shader::Shader(std::string vert_src, std::string frag_src) {
+   init_shader(vert_src, frag_src);
+}
+void Shader::init_shader(std::string vert_src, std::string frag_src){
    uint vtx, frg;
 
    compile(&vtx, vert_src, GL_VERTEX_SHADER);
@@ -14,7 +17,6 @@ Shader::Shader(std::string vert_src, std::string frag_src) {
    link(vtx, frg);
    glDeleteShader(vtx);
    glDeleteShader(frg);
-
 }
 
 Shader::~Shader(){

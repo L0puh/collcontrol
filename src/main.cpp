@@ -1,5 +1,4 @@
 #include "collcontrol.hpp"
-#include "vertices.hpp"
 
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -7,23 +6,17 @@
 void enable_if_debug();
 void shutdown(GLFWwindow*);
 
+
 int main() {
    GLFWwindow *window = init_window(500, 500);
+   imgui::init(window);
    enable_if_debug();
   
-   Shader shd("shaders/default.vert", "shaders/default.frag");
-   
-   Vertex vertx;
    Camera camera(window, 0);
-
-   vertx.create_VBO(vertices::triangle, sizeof(vertices::triangle));
-   // vertx.create_EBO(indices::square, sizeof(indices::square));
-   vertx.add_atrib(0, 3, GL_FLOAT);
+   state.camera = &camera;
+   Shape shape(shape_type::circle);
    
-   Shape shape(&vertx);
-   shape.set_shape(shape_type::triangle);
-   
-   Object obj(&shd, &shape);
+   Object obj(&shape);
    obj.set_color(color::red);
    obj.set_size(glm::vec3(2.0f, 2.0f, 1.0f));
    obj.set_pos(glm::vec3(0.5, 0.5, 0.0f));
@@ -35,6 +28,10 @@ int main() {
 
       obj.set_pos(glm::vec3(0.0f, glm::cos(glfwGetTime()), 0.0f));
       obj.draw(camera.get_projection(-3.0f), camera.get_view());
+
+      imgui::frame();
+      imgui::draw_main();
+      imgui::render();
 
       glfwSetKeyCallback(window, key_callback);
       glfwSwapBuffers(window);
