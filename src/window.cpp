@@ -32,6 +32,10 @@ GLFWwindow* init_window(int width, int height){
 
    glfwSetFramebufferSizeCallback(window, frame_buffer_size);
    log_info("init window");
+
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   
    return window;
 }
 

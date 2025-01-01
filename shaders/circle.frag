@@ -16,6 +16,6 @@ void main() {
    if (distance(uv, centerNDC.xy) <= _radius){
       color = vec4(_color, 1.0f);
    } else
-      color = vec4(0.0, 0.0, 1.0, 1.0f);
+      color = vec4(0.0, 0.0, 0.0, 0.0f);
 
 }

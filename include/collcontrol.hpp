@@ -106,12 +106,9 @@ class Shape {
       shape_type shape; 
       GLenum mode = GL_TRIANGLES;
       Shader shader;
-      glm::vec2 center;
-      float radius;
 
    public:
-      Shape(shape_type type, glm::vec2 center=glm::vec2(0.2f), float radius=1.4f): 
-         shape(type), center(center), radius(radius)
+      Shape(shape_type type): shape(type)
       {
          set_shape(type);
          switch(type){
@@ -200,6 +197,8 @@ class Object {
       float angle = 0.0f;
       glm::mat4 model, view, proj;
       glm::vec3 pos, size, color, rotation_pos;
+      glm::vec2 center = {0.0f, 0.0};
+      float radius = 0.5f;
 
 
    public:
@@ -234,6 +233,9 @@ namespace imgui {
    void frame();
    void render();
    void draw_main();
+   void edit_circle(Object *obj);
+   void edit_object(Object *obj);
+   void edit_quad(Object *obj);
 
 }
 
