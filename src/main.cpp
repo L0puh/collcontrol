@@ -28,15 +28,13 @@ int main() {
    while (!glfwWindowShouldClose(window)){
       glClearBufferfv(GL_COLOR, 0, state.bg_color);   
       camera.update();
-
-      obj.set_pos(glm::vec3(0.0f, glm::cos(glfwGetTime()), 0.0f));
-      obj.draw(camera.get_projection(-3.0f), camera.get_view());
+      
+      obj.set_pos(glm::vec3(camera.get_mouse_pos(), 0.0f));
+      obj.draw(camera.get_projection(), camera.get_view());
 
       imgui::frame();
       imgui::draw_main();
-
       imgui::edit_object(&obj);
-
       imgui::render();
 
       glfwSetKeyCallback(window, key_callback);

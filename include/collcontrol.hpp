@@ -169,23 +169,39 @@ class Camera {
       bool is_3D;
       glm::mat4 view;
       glm::vec3 pos; 
-      float speed, rotation_speed, rotation;
-      int window_width, window_height;
+      float speed, rotation_speed, rotation, zoom;
+      double window_width, window_height;
       
    public:
       Camera(GLFWwindow* window, bool is_3D): window(window),
          speed(1.2f), rotation_speed(1.2f), rotation(0.0f), 
-         is_3D(is_3D), view(glm::mat4(1.0f)), pos(glm::vec3(0.0f)){}
+         is_3D(is_3D), view(glm::mat4(1.0f)), pos(glm::vec3(0.0f)), 
+         zoom(-3.0f){}
    public:
       glm::vec2 get_window_size(){ return glm::vec2(window_width, window_height); }
+      glm::vec2 project(double x, double y) {
+         double normx, normy;
+         normx = (x / window_width ) *  2.0f - 1.0f; 
+         normy = (y / window_height) * -2.0f + 1.0f; 
+         glm::mat4 proj = glm::inverse(get_projection());
+         glm::vec4 world = glm::vec4(normx, normy, 1.0f, 1.0f) * proj;
+         return world;
+      }
+
+      glm::vec2 get_mouse_pos() {
+         double x, y;
+         glfwGetCursorPos(window, &x, &y);
+         return project(x, y);
+      }
+
       void update(){ 
          view = glm::mat4(1.0f);
          view = glm::translate(view, pos);
-         glfwGetWindowSize(window, &window_width, &window_height);
       }
       void set_pos(glm::vec3 pos) { this->pos = pos; }
       glm::mat4 get_view() { return view;}
-      glm::mat4 get_projection(float zoom);
+      void set_zoom(float zoom) { this->zoom = zoom; }
+      glm::mat4 get_projection();
 };
 
 

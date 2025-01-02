@@ -6,6 +6,8 @@ STATE state;
 
 void frame_buffer_size(GLFWwindow* wind, int width, int height){
    glViewport(0, 0, width, height);
+   state.camera->window_width = width;
+   state.camera->window_height = height;
 }
 
 GLFWwindow* init_window(int width, int height){
@@ -21,7 +23,7 @@ GLFWwindow* init_window(int width, int height){
    window = glfwCreateWindow(width, height, "window", 0, 0);
    if (window == NULL) {
      printf("[-] error[%s:%s:%d]: %s\n",
-            "/home/lopuh/code/collcontrol/src/window.cpp", __func__, 16,
+            __FILE__, __func__, 16,
             "window init failed");
      exit(-1);
    };
@@ -38,7 +40,6 @@ GLFWwindow* init_window(int width, int height){
    
    return window;
 }
-
 
 void debug_message_callback(GLenum src, GLenum type, 
                       GLuint id,GLuint sev, GLsizei len, 
