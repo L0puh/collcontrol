@@ -21,12 +21,22 @@ namespace imgui {
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
    }
    void draw_main(){
+      bool is_move = state.camera->flags & CAMERA_MOVE;
       ImGui::Begin("main", 0, ImGuiWindowFlags_AlwaysAutoResize);
       {
          ImGui::Text("MAIN FRAME WINDOW");
          ImGui::ColorEdit4("BG COLOR:", state.bg_color, 0);
+         ImGui::Checkbox("MOVE CAMERA:", &is_move);
       }
       ImGui::End();
+      //it's a hack, FIXME later 
+      if (is_move && !(state.camera->flags & CAMERA_MOVE)){
+         state.camera->set_flag(CAMERA_MOVE|CAMERA_CHANGED);
+      } else if (!is_move && state.camera->flags & CAMERA_MOVE) {
+         state.camera->clear_flag(CAMERA_MOVE);
+         state.camera->set_flag(CAMERA_CHANGED);
+      }
+
    }
 
    void edit_circle(Object *obj){

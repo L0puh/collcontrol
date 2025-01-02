@@ -15,7 +15,7 @@ int main() {
    Shape shape(shape_type::circle);
    Object obj(&shape);
    Camera camera(window, 0);
-   
+   camera.set_flag(CAMERA_FIXED); 
    state.camera = &camera;
    memcpy(state.bg_color, color::blue, 
          sizeof(color::blue));
@@ -24,7 +24,8 @@ int main() {
    obj.set_size(glm::vec3(2.0f, 2.0f, 1.0f));
    obj.set_pos(glm::vec3(0.5, 0.5, 0.0f));
    obj.set_rotation(glm::radians(180.0f),  glm::vec3(0.0f, 0.0f, 1.0f));
-  
+
+ 
    while (!glfwWindowShouldClose(window)){
       glClearBufferfv(GL_COLOR, 0, state.bg_color);   
       camera.update();

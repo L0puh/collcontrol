@@ -1,6 +1,7 @@
 #ifndef COLLCONTROL
 #define COLLCONTROL 
 
+#include <cstdint>
 #include <cstdio>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -21,6 +22,11 @@
 #endif
 
 #define LEN(n) sizeof(n)/sizeof(n[0])
+
+#define CAMERA_3D      0b1000
+#define CAMERA_FIXED   0b0100
+#define CAMERA_MOVE    0b0010
+#define CAMERA_CHANGED 0b0001
 
 
 namespace color {
@@ -163,50 +169,49 @@ class Shape {
    }
 };
 
+
 class Camera {
    public:
       GLFWwindow* window;
-      bool is_3D;
+      uint8_t flags;
       glm::mat4 view;
       glm::vec3 pos; 
       float speed, rotation_speed, rotation, zoom;
       double window_width, window_height;
       
    public:
-      Camera(GLFWwindow* window, bool is_3D): window(window),
-         speed(1.2f), rotation_speed(1.2f), rotation(0.0f), 
-         is_3D(is_3D), view(glm::mat4(1.0f)), pos(glm::vec3(0.0f)), 
+      Camera(GLFWwindow* window, uint8_t flags): window(window),
+         speed(0.05f), rotation_speed(1.2f), rotation(0.0f), 
+         flags(flags), view(glm::mat4(1.0f)), pos(glm::vec3(0.0f)), 
          zoom(-3.0f){}
    public:
-      glm::vec2 get_window_size(){ return glm::vec2(window_width, window_height); }
-      glm::vec2 project(double x, double y) {
-         double normx, normy;
-         normx = (x / window_width ) *  2.0f - 1.0f; 
-         normy = (y / window_height) * -2.0f + 1.0f; 
-         glm::mat4 proj = glm::inverse(get_projection());
-         glm::vec4 world = glm::vec4(normx, normy, 1.0f, 1.0f) * proj;
-         return world;
-      }
-
-      glm::vec2 get_mouse_pos() {
-         double x, y;
-         glfwGetCursorPos(window, &x, &y);
-         return project(x, y);
-      }
-
-      void update(){ 
-         view = glm::mat4(1.0f);
-         view = glm::translate(view, pos);
-      }
-      void set_pos(glm::vec3 pos) { this->pos = pos; }
-      glm::mat4 get_view() { return view;}
-      void set_zoom(float zoom) { this->zoom = zoom; }
+      void update_movement(float deltatime);
+      glm::vec2 project(double x, double y);
+      
+      glm::vec2 get_mouse_pos();
       glm::mat4 get_projection();
-};
+      void update();
 
+   public:
+      void hide_cursor() { 
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      }
+      void show_cursor() { 
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      }
+      void set_pos(glm::vec3 pos)   { this->pos   = pos; }
+      void set_speed(float speed)   { this->speed = speed; }
+      void set_zoom(float zoom)     { this->zoom  = zoom; }
+      glm::vec2 get_window_size()   { return glm::vec2(window_width, window_height); }
+      glm::mat4 get_view()          { return view;}
+      void clear_flag(uint8_t flag) { flags &= ~flag; }
+      void set_flag(uint8_t flag)   { flags |= flag; }
+
+};
 
 class Object {
    public:
+      uint8_t flags;
       Shader *shader;
       Shape  *shape;
       
