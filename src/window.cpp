@@ -59,5 +59,9 @@ void key_callback(GLFWwindow* window, int key, int code, int action, int mods){
       case GLFW_KEY_Q:
          glfwSetWindowShouldClose(window, true);
          return;
+      case GLFW_KEY_T:
+         state.create_triangle = 1;
+         return;
+
    }
 }

@@ -1,9 +1,9 @@
 #include "collcontrol.hpp"
 
 namespace collision {
-   bool point_is_inside(glm::vec2 p, Object *obj){
-      glm::vec2 sz = obj->size, pos = obj->pos;
-      if (obj->shape->type == shape_type::rectangle){
+   bool point_is_inside(glm::vec2 p, Object &obj){
+      glm::vec2 sz = obj.size, pos = obj.pos;
+      if (obj.shape->type == shape_type::rectangle){
          bool t1, t2, t3, t4;
          glm::vec2 ru, lu, ld, rd;
 
@@ -20,7 +20,7 @@ namespace collision {
          t4 = ld.x <= p.x && ld.y <= p.y;
 
          return (t1 && t2 && t3 && t4);
-      } else if (obj->shape->type == shape_type::triangle){
+      } else if (obj.shape->type == shape_type::triangle){
          float d, l, u, r;
          glm::vec2 up, rt, lt;
          
@@ -39,13 +39,13 @@ namespace collision {
         
          return l >= 0 && u >= 0 && r >= 0;
 
-      } else if (obj->shape->type == shape_type::circle){
+      } else if (obj.shape->type == shape_type::circle){
          float r, dist;
          
          dist = (p.x - pos.x) * (p.x - pos.x) +
                 (p.y - pos.y) * (p.y - pos.y);
 
-         r = obj->radius;
+         r = obj.radius;
          return dist <= r*r;
       }
       return 0;

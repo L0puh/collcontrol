@@ -211,6 +211,7 @@ class Camera {
 
 class Object {
    public:
+      int id;
       uint8_t flags;
       Shader *shader;
       Shape  *shape;
@@ -223,7 +224,7 @@ class Object {
 
 
    public:
-      Object(Shape *shape): shader(&shape->shader), shape(shape) {};
+      Object(int id, Shape *shape): shader(&shape->shader), shape(shape), id(id) {};
       ~Object() {};
 
    public:
@@ -250,7 +251,7 @@ class Object {
 };
 
 namespace collision {
-   bool point_is_inside(glm::vec2 pos, Object *obj);
+   bool point_is_inside(glm::vec2 pos, Object &obj);
       
 };
 
