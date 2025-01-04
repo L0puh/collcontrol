@@ -99,7 +99,7 @@ class Shader {
 };
 
 typedef enum {
-   square,
+   rectangle,
    triangle,
    circle
 
@@ -109,25 +109,25 @@ class Shape {
    public:
       uint size;
       Vertex vertex;
-      shape_type shape; 
+      shape_type type; 
       GLenum mode = GL_TRIANGLES;
       Shader shader;
 
    public:
-      Shape(shape_type type): shape(type)
+      Shape(shape_type type): type(type)
       {
          set_shape(type);
          switch(type){
             case circle:
                shader.init_shader("shaders/circle.vert", "shaders/circle.frag");
-               vertex.create_VBO(vertices::square, sizeof(vertices::square));
-               vertex.create_EBO(indices::square, sizeof(indices::square));
+               vertex.create_VBO(vertices::rectangle, sizeof(vertices::rectangle));
+               vertex.create_EBO(indices::rectangle, sizeof(indices::rectangle));
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
-            case square:
+            case rectangle:
                shader.init_shader("shaders/default.vert", "shaders/default.frag");
-               vertex.create_VBO(vertices::square, sizeof(vertices::square));
-               vertex.create_EBO(indices::square, sizeof(indices::square));
+               vertex.create_VBO(vertices::rectangle, sizeof(vertices::rectangle));
+               vertex.create_EBO(indices::rectangle, sizeof(indices::rectangle));
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
             case triangle:
@@ -144,14 +144,14 @@ class Shape {
       void set_size(uint s)        { size = s; }
       void set_mode(GLenum m)      { mode = m; }
       void set_shape(shape_type t) { 
-         shape = t;
-         switch(shape){
+         type = t;
+         switch(type){
             case shape_type::triangle:
                size = LEN(vertices::triangle);
                break;
-            case shape_type::square:
+            case shape_type::rectangle:
             case shape_type::circle:
-               size = LEN(vertices::square);
+               size = LEN(vertices::rectangle);
               break;
          }
       }
@@ -247,6 +247,11 @@ class Object {
       void translate(glm::vec3 pos);
       void rotate(float angle, glm::vec3 pos);
 
+};
+
+namespace collision {
+   bool point_is_inside(glm::vec2 pos, Object *obj);
+      
 };
 
 namespace imgui {

@@ -9,7 +9,7 @@ namespace vertices {
       0.5f,  -0.5f, 0.0f,
       0.0f,   0.5f, 0.0f
    };
-   const float square[] = {
+   const float rectangle[] = {
      0.5f,  0.5f, 0.0f, // top right
      0.5f, -0.5f, 0.0f, // bottom right
     -0.5f, -0.5f, 0.0f, // bottom left
@@ -18,7 +18,7 @@ namespace vertices {
 };
 
 namespace indices {
-   const uint square[] = {
+   const uint rectangle[] = {
       0, 1, 2,
       0, 2, 3
    };

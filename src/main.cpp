@@ -1,5 +1,5 @@
 #include "collcontrol.hpp"
-
+#include "input.hpp"
 #include <GLFW/glfw3.h>
 #include <cmath>
 
@@ -12,7 +12,7 @@ int main() {
    imgui::init(window);
    enable_if_debug();
   
-   Shape shape(shape_type::circle);
+   Shape shape(shape_type::triangle);
    Object obj(&shape);
    Camera camera(window, 0);
    camera.set_flag(CAMERA_FIXED); 
@@ -25,13 +25,25 @@ int main() {
    obj.set_pos(glm::vec3(0.5, 0.5, 0.0f));
    obj.set_rotation(glm::radians(180.0f),  glm::vec3(0.0f, 0.0f, 1.0f));
 
- 
+      
+   glm::vec2 last;
    while (!glfwWindowShouldClose(window)){
       glClearBufferfv(GL_COLOR, 0, state.bg_color);   
       camera.update();
       
-      obj.set_pos(glm::vec3(camera.get_mouse_pos(), 0.0f));
       obj.draw(camera.get_projection(), camera.get_view());
+
+      if (state.mouse_clicked){
+         if (collision::point_is_inside(camera.get_mouse_pos(), &obj)){
+            glm::vec2 p = camera.get_mouse_pos();
+            if (state.mouse_clicked_changed){
+               last = { p.x - obj.pos.x, p.y - obj.pos.y};
+               state.mouse_clicked_changed = 0;
+            }
+            obj.set_pos(glm::vec3(p.x - last.x, p.y - last.y, 0.0f));
+         }
+      }
+
 
       imgui::frame();
       imgui::draw_main();

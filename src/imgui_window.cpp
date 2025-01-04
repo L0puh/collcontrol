@@ -1,7 +1,9 @@
 #include "collcontrol.hpp"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include <cstdio>
 #include <imgui/imgui.h>
+#include <string>
 
 namespace imgui {
    void init(GLFWwindow* window){
@@ -25,6 +27,8 @@ namespace imgui {
       ImGui::Begin("main", 0, ImGuiWindowFlags_AlwaysAutoResize);
       {
          ImGui::Text("MAIN FRAME WINDOW");
+         glm::vec2 mouse_pos = state.camera->get_mouse_pos();
+         ImGui::Text("MOUSE COORDS: %.6f %.6f", mouse_pos.x, mouse_pos.y);
          ImGui::ColorEdit4("BG COLOR:", state.bg_color, 0);
          ImGui::Checkbox("MOVE CAMERA:", &is_move);
       }
@@ -55,7 +59,7 @@ namespace imgui {
       obj->color = {color[0], color[1], color[2]};
    }
    void edit_object(Object *obj){
-      if (obj->shape->shape == shape_type::circle){
+      if (obj->shape->type == shape_type::circle){
          edit_circle(obj);
       } else {
          edit_quad(obj);

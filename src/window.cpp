@@ -1,6 +1,7 @@
 #include "collcontrol.hpp"
 #include <GLFW/glfw3.h>
 #include <cstdlib>
+#include "input.hpp"
 
 STATE state;
 
@@ -33,6 +34,8 @@ GLFWwindow* init_window(int width, int height){
       error_and_exit("glad load failed");
 
    glfwSetFramebufferSizeCallback(window, frame_buffer_size);
+   glfwSetMouseButtonCallback(window, input::mouse_callback);
+
    log_info("init window");
 
    glEnable(GL_BLEND);
