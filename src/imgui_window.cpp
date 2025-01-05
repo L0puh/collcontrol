@@ -75,4 +75,25 @@ namespace imgui {
       ImGui::SliderFloat("ANGLE:##", &obj->angle, 0, 90.0f, "%.10f", 0);
       obj->color = {color[0], color[1], color[2]};
    }
+   void create_objects_popup(){
+      ImGui::Begin("main");
+      if (ImGui::BeginPopupContextVoid()){
+         ImGui::Text("create new object:");
+         if (ImGui::Selectable("triangle")){
+            state.renderer->create_new_object(shape_type::triangle, 
+                  state.camera->get_mouse_pos());
+
+         }
+         if (ImGui::Selectable("circle")){
+            state.renderer->create_new_object(shape_type::circle, 
+                  state.camera->get_mouse_pos());
+         }
+         if (ImGui::Selectable("rectangle")){
+            state.renderer->create_new_object(shape_type::rectangle, 
+                  state.camera->get_mouse_pos());
+         }
+         ImGui::EndPopup();
+      }
+      ImGui::End();
+   }
 };

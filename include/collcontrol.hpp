@@ -254,16 +254,20 @@ class Object {
 class Renderer {
    Camera *camera;
    GLFWwindow *window;
-   Shape *shape; 
    int current_id = -1;
-   float last_press = 0.0f;
    glm::vec2 last_pos; 
+   
+   std::vector<Shape*> shapes;
+   std::vector<Object> *objects;
    public:
       Renderer(Camera *cam, GLFWwindow *win): 
                   camera(cam), window(win){}
    public:
       void render(std::vector<Object> *objects);
+      void create_new_object(shape_type type, glm::vec2 pos);
       void update();
+      void set_objects(std::vector<Object> *objects) {this->objects = objects;}
+      void add_shape(Shape *shape){ shapes.push_back(shape); }
 };
 
 
@@ -280,6 +284,7 @@ namespace imgui {
    void edit_circle(Object *obj);
    void edit_object(Object *obj);
    void edit_quad(Object *obj);
+   void create_objects_popup();
 
 }
 

@@ -12,37 +12,28 @@ int main() {
    imgui::init(window);
    enable_if_debug();
   
-   Shape shape(shape_type::triangle);
    Camera camera(window, 0);
+   Renderer renderer(&camera, window);
+   
    camera.set_flag(CAMERA_FIXED); 
-   state.camera = &camera;
    memcpy(state.bg_color, color::blue, 
          sizeof(color::blue));
 
       
-   glm::vec2 last;
-
+   Shape rect(shape_type::rectangle), triag(shape_type::triangle), 
+         circle(shape_type::circle);
    std::vector<Object> objects;
-   int current_id = -1;
-   float last_press = 0.0f;
    state.last_frame = 0.0f;
    state.cooldown = 0.5f;
-
-   Renderer renderer(&camera, window);
+   state.camera = &camera;
+   state.renderer = &renderer;
+   renderer.add_shape(&rect);
+   renderer.add_shape(&triag);
+   renderer.add_shape(&circle);
+   renderer.set_objects(&objects);
 
    while (!glfwWindowShouldClose(window)){
       renderer.update();
-      
-      if (state.keys[GLFW_KEY_T] && state.mouse_clicked && glfwGetTime()-last_press>state.cooldown){
-         last_press = glfwGetTime();
-         Object obj(objects.size(), &shape);
-         obj.set_color(color::white);
-         obj.set_size(glm::vec3(2.0f, 2.0f, 1.0f));
-         obj.set_pos(glm::vec3(camera.get_mouse_pos(), 1.0f));
-         obj.set_rotation(glm::radians(180.0f),  glm::vec3(0.0f, 0.0f, 1.0f));
-         objects.push_back(obj);
-      }
-
       renderer.render(&objects);
    }
    

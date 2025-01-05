@@ -4,8 +4,10 @@
 
 #include <map>
 class Camera;
+class Renderer;
 struct STATE {
    Camera *camera;
+   Renderer *renderer;
    float bg_color[4];
    float deltatime;
    float last_frame;
