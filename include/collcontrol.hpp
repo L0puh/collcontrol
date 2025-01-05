@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <unordered_map>
 #include <glm/mat4x4.hpp>
+#include <vector>
 
 #include "state.hpp"
 #include "vertices.hpp"
@@ -181,11 +182,11 @@ class Camera {
       
    public:
       Camera(GLFWwindow* window, uint8_t flags): window(window),
-         speed(0.05f), rotation_speed(1.2f), rotation(0.0f), 
+         speed(1.0f), rotation_speed(1.2f), rotation(0.0f), 
          flags(flags), view(glm::mat4(1.0f)), pos(glm::vec3(0.0f)), 
          zoom(-3.0f){}
    public:
-      void update_movement(float deltatime);
+      void update_movement();
       glm::vec2 project(double x, double y);
       
       glm::vec2 get_mouse_pos();
@@ -250,6 +251,22 @@ class Object {
 
 };
 
+class Renderer {
+   Camera *camera;
+   GLFWwindow *window;
+   Shape *shape; 
+   int current_id = -1;
+   float last_press = 0.0f;
+   glm::vec2 last_pos; 
+   public:
+      Renderer(Camera *cam, GLFWwindow *win): 
+                  camera(cam), window(win){}
+   public:
+      void render(std::vector<Object> *objects);
+      void update();
+};
+
+
 namespace collision {
    bool point_is_inside(glm::vec2 pos, Object &obj);
       
@@ -268,7 +285,7 @@ namespace imgui {
 
 void debug_message_callback (GLenum, GLenum, GLuint, GLuint,
                             GLsizei, const GLchar*, const GLvoid*);
-void key_callback(GLFWwindow*, int, int, int, int);
+void update_deltatime();
 
 GLFWwindow* init_window(int width, int height);
 

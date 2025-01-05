@@ -35,6 +35,7 @@ GLFWwindow* init_window(int width, int height){
 
    glfwSetFramebufferSizeCallback(window, frame_buffer_size);
    glfwSetMouseButtonCallback(window, input::mouse_callback);
+   glfwSetKeyCallback(window, input::key_callback);
 
    log_info("init window");
 
@@ -54,14 +55,9 @@ void debug_message_callback(GLenum src, GLenum type,
    }
 }
 
-void key_callback(GLFWwindow* window, int key, int code, int action, int mods){
-   switch(key){
-      case GLFW_KEY_Q:
-         glfwSetWindowShouldClose(window, true);
-         return;
-      case GLFW_KEY_T:
-         state.create_triangle = 1;
-         return;
-
-   }
+void update_deltatime(){
+   float time;
+   time = glfwGetTime();
+   state.deltatime = time - state.last_frame;
+   state.last_frame = time;
 }

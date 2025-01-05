@@ -1,5 +1,4 @@
 #include "collcontrol.hpp"
-#include "input.hpp"
 #include <GLFW/glfw3.h>
 #include <cmath>
 #include <vector>
@@ -25,34 +24,17 @@ int main() {
 
    std::vector<Object> objects;
    int current_id = -1;
-   while (!glfwWindowShouldClose(window)){
-      glClearBufferfv(GL_COLOR, 0, state.bg_color);   
-      camera.update();
-      imgui::frame();
-      imgui::draw_main();
+   float last_press = 0.0f;
+   state.last_frame = 0.0f;
+   state.cooldown = 0.5f;
 
-      for(int i = 0; i < objects.size(); i++){
-         Object obj = objects.at(i);
-         obj.draw(camera.get_projection(), camera.get_view());
-         if (state.mouse_clicked){
-            if (collision::point_is_inside(camera.get_mouse_pos(), obj) && (current_id == -1 || current_id == obj.id)){
-               glm::vec2 p = camera.get_mouse_pos();
-               if (state.mouse_clicked_changed){
-                  last = { p.x - obj.pos.x, p.y - obj.pos.y};
-                  current_id = obj.id;
-                  state.mouse_clicked_changed = 0;
-               }
-               obj.set_pos(glm::vec3(p.x - last.x, p.y - last.y, 0.0f));
-               objects.at(i) = obj;
-            }
-         } else current_id = -1;
-         imgui::edit_object(&obj);
-      }
-      if (state.create_triangle){
-         // FIXME: add delay between clicking (aka delta time?)
-         // and change create_triangle flag to something different.
-         // perhaps add bitwise flags
-         state.create_triangle = 0;
+   Renderer renderer(&camera, window);
+
+   while (!glfwWindowShouldClose(window)){
+      renderer.update();
+      
+      if (state.keys[GLFW_KEY_T] && state.mouse_clicked && glfwGetTime()-last_press>state.cooldown){
+         last_press = glfwGetTime();
          Object obj(objects.size(), &shape);
          obj.set_color(color::white);
          obj.set_size(glm::vec3(2.0f, 2.0f, 1.0f));
@@ -61,11 +43,7 @@ int main() {
          objects.push_back(obj);
       }
 
-      imgui::render();
-
-      glfwSetKeyCallback(window, key_callback);
-      glfwSwapBuffers(window);
-      glfwPollEvents();
+      renderer.render(&objects);
    }
    
    shutdown(window);

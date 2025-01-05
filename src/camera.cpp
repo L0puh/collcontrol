@@ -10,18 +10,18 @@ glm::mat4 Camera::get_projection() {
 }
 
 
-void Camera::update_movement(float deltatime){
+void Camera::update_movement(){
    if (input::is_pressed(window, GLFW_KEY_W)){
-      pos.y += speed * deltatime;
+      pos.y += speed * state.deltatime;
    }
    if (input::is_pressed(window, GLFW_KEY_S)){
-      pos.y -= speed * deltatime;
+      pos.y -= speed * state.deltatime;
    }
    if (input::is_pressed(window, GLFW_KEY_D)){
-      pos.x += speed * deltatime;
+      pos.x += speed * state.deltatime;
    }
    if (input::is_pressed(window, GLFW_KEY_A)){
-      pos.x -= speed * deltatime;
+      pos.x -= speed * state.deltatime;
    }
 }
 
@@ -42,7 +42,7 @@ glm::vec2 Camera::get_mouse_pos() {
 void Camera::update(){ 
    if (flags & CAMERA_MOVE){
       hide_cursor();
-      update_movement(1.0f); //FIXME: calculate deltatime
+      update_movement(); 
    }   
    else if (flags & CAMERA_CHANGED){
       show_cursor();

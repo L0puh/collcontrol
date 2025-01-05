@@ -24,6 +24,18 @@ namespace input {
          }
       }
    }
+   inline void key_callback(GLFWwindow* window, int key, int code, int action, int mods){
+      if (action == GLFW_PRESS) 
+         state.keys[key] = true;
+      else if (action == GLFW_RELEASE)
+         state.keys[key] = false;
+
+      switch(key){
+         case GLFW_KEY_Q:
+            glfwSetWindowShouldClose(window, true);
+            return;
+      }
+   }
 };
 
 
