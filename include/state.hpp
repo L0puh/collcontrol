@@ -14,6 +14,7 @@ struct STATE {
    float cooldown; // seconds
    bool mouse_clicked;
    bool mouse_clicked_changed;
+   bool imgui_focused;
    std::map<int, bool> keys;
 
 };

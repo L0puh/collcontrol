@@ -285,6 +285,7 @@ namespace imgui {
    void edit_object(Object *obj);
    void edit_quad(Object *obj);
    void create_objects_popup();
+   void update_focused();
 
 }
 

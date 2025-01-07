@@ -30,10 +30,10 @@ void Renderer::create_new_object(shape_type type, glm::vec2 pos){
 
 void Renderer::render(std::vector<Object> *objects) {
    //FIXME: refactor this...
-   for(int i = 0; i < objects->size(); i++){
+   for(int i = objects->size()-1; i >= 0; i--){
       Object obj = objects->at(i);
       obj.draw(camera->get_projection(), camera->get_view());
-      if (state.mouse_clicked){
+      if (state.mouse_clicked && !state.imgui_focused){
          if (collision::point_is_inside(camera->get_mouse_pos(), obj) 
             && (current_id == -1 || current_id == obj.id)){
             glm::vec2 p = camera->get_mouse_pos();
@@ -47,7 +47,6 @@ void Renderer::render(std::vector<Object> *objects) {
                                   0.0f));
          }
       } else current_id = -1;
-      imgui::edit_object(&obj);
       objects->at(i) = obj;
    }
    imgui::render();

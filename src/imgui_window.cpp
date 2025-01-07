@@ -3,7 +3,6 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include <cstdio>
 #include <imgui/imgui.h>
-#include <string>
 
 namespace imgui {
    void init(GLFWwindow* window){
@@ -25,7 +24,9 @@ namespace imgui {
    void draw_main(){
       bool is_move = state.camera->flags & CAMERA_MOVE;
       ImGui::Begin("main", 0, ImGuiWindowFlags_AlwaysAutoResize);
+
       {
+         update_focused();
          ImGui::Text("MAIN FRAME WINDOW");
          glm::vec2 mouse_pos = state.camera->get_mouse_pos();
          ImGui::Text("MOUSE COORDS: %.6f %.6f", mouse_pos.x, mouse_pos.y);
@@ -48,14 +49,12 @@ namespace imgui {
       ImGui::Text("EDIT CIRCLE");
       ImGui::SliderFloat("RADIUS##", &obj->radius, 0, 5.0f, "%.5f", 0);
       ImGui::ColorEdit3("COLOR:##", color, 0);
-      ImGui::SliderFloat("POS X:##", &obj->pos.x, 0, 100.0f, "%.5f", 0);
-      ImGui::SliderFloat("POS Y:##", &obj->pos.y, 0, 100.0f, "%.5f", 0);
-      ImGui::SliderFloat("CC X:##", &obj->center.x, -1.0f, 1.0f, "%.9f", 0);
-      ImGui::SliderFloat("CC Y:##", &obj->center.y, -1.0f, 1.0f, "%.9f", 0);
+      ImGui::SliderFloat2("POS:##", &obj->pos.x, -10, 10.0f, "%.5f", 0);
+      ImGui::SliderFloat2("CENTER POS:##", &obj->center.y, -1.0f, 1.0f, "%.9f", 0);
       obj->color = {color[0], color[1], color[2]};
    }
    void edit_object(Object *obj){
-      ImGui::Begin("main##edit", 0, ImGuiWindowFlags_AlwaysAutoResize);
+      ImGui::Begin("main", 0, ImGuiWindowFlags_AlwaysAutoResize);
       ImGui::PushID(obj->id);
       if (obj->shape->type == shape_type::circle){
          edit_circle(obj);
@@ -69,12 +68,17 @@ namespace imgui {
    void edit_quad(Object *obj){
       float color[3] = {obj->color.x, obj->color.y, obj->color.z};
       ImGui::Text("EDIT QUAD");
-      ImGui::ColorEdit3("COLOR:##", color, 0);
-      ImGui::SliderFloat("POS X:##", &obj->pos.x, 0, 100.0f, "%.5f", 0);
-      ImGui::SliderFloat("POS Y:##", &obj->pos.y, 0, 100.0f, "%.5f", 0);
+      ImGui::ColorEdit3("COLOR:##", color, 1);
+
+      ImGui::SliderFloat2("POS:##", &obj->pos.x, -10, 10.0f, "%.5f", 0);
       ImGui::SliderFloat("ANGLE:##", &obj->angle, 0, 90.0f, "%.10f", 0);
       obj->color = {color[0], color[1], color[2]};
    }
+   void update_focused(){
+      state.imgui_focused = ImGui::IsWindowFocused() || ImGui::IsAnyItemFocused() ||
+                            ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive();
+   }
+
    void create_objects_popup(){
       ImGui::Begin("main");
       if (ImGui::BeginPopupContextVoid()){

@@ -1,4 +1,5 @@
 #include "collcontrol.hpp"
+#include "input.hpp"
 #include <GLFW/glfw3.h>
 #include <cmath>
 #include <vector>
@@ -31,9 +32,31 @@ int main() {
    renderer.add_shape(&triag);
    renderer.add_shape(&circle);
    renderer.set_objects(&objects);
-
+   
+   bool edit_flag = 0;
+   int edit_object = -1;
+   float last_press = 0.0f;
    while (!glfwWindowShouldClose(window)){
       renderer.update();
+         
+      if ((state.keys[GLFW_MOUSE_BUTTON_LEFT] && glfwGetTime()-last_press >= state.cooldown)  || edit_flag){
+         glm::vec2 pos = camera.get_mouse_pos();
+         for (int i = objects.size()-1; i >= 0; i--){
+            if (collision::point_is_inside(pos, objects.at(i))){
+               if (state.keys[GLFW_MOUSE_BUTTON_LEFT]&& glfwGetTime()-last_press >= state.cooldown){ 
+                  last_press = glfwGetTime();
+                  if (edit_flag && !state.imgui_focused) edit_flag = 0;
+                  else{
+                     edit_flag = 1;
+                     edit_object = objects.at(i).id;
+                  }
+               }  
+            }
+            if (edit_flag && edit_object == objects.at(i).id)
+               imgui::edit_object(&objects.at(i));
+         }
+      }
+
       renderer.render(&objects);
    }
    
