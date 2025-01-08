@@ -267,12 +267,15 @@ class Renderer {
       void create_new_object(shape_type type, glm::vec2 pos);
       void update();
       void set_objects(std::vector<Object> *objects) {this->objects = objects;}
+      void draw_objects(std::vector<Object>*objects);
       void add_shape(Shape *shape){ shapes.push_back(shape); }
+      void drag_drop(std::vector<Object> *objects);
 };
 
 
 namespace collision {
    bool point_is_inside(glm::vec2 pos, Object &obj);
+   bool AABB(Object x, Object y);
       
 };
 
@@ -295,5 +298,6 @@ void update_deltatime();
 
 GLFWwindow* init_window(int width, int height);
 
+void check_collisions_FIXME(std::vector<Object> *objects);
 
 #endif 

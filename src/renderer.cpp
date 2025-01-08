@@ -28,7 +28,27 @@ void Renderer::create_new_object(shape_type type, glm::vec2 pos){
    objects->push_back(obj);
 }
 
-void Renderer::render(std::vector<Object> *objects) {
+void check_collisions_FIXME(std::vector<Object> *objects){
+   for(int i = 0; i < objects->size(); i++){
+      for(int j = i+1; j < objects->size(); j++){
+         if (collision::AABB(objects->at(i), objects->at(j))){
+            printf("COLLISION!!!\n");
+         } else {
+            printf("NOOOO COLLISION!!!\n");
+         }
+      }
+   }
+}
+
+
+void Renderer::draw_objects(std::vector<Object>*objects){
+   for(int i = 0; i < objects->size(); ++i){
+      Object obj = objects->at(i);
+      obj.draw(camera->get_projection(), camera->get_view());
+   }
+}
+
+void Renderer::drag_drop(std::vector<Object> *objects){
    //FIXME: refactor this...
    for(int i = objects->size()-1; i >= 0; i--){
       Object obj = objects->at(i);
@@ -49,6 +69,10 @@ void Renderer::render(std::vector<Object> *objects) {
       } else current_id = -1;
       objects->at(i) = obj;
    }
+}
+void Renderer::render(std::vector<Object> *objects) {
+   drag_drop(objects);
+   draw_objects(objects);
    imgui::render();
    glfwSwapBuffers(window);
    glfwPollEvents();

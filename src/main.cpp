@@ -57,6 +57,7 @@ int main() {
          }
       }
 
+      check_collisions_FIXME(&objects);
       renderer.render(&objects);
    }
    
