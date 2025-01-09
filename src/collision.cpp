@@ -1,8 +1,5 @@
 #include "collcontrol.hpp"
 
-struct collider {
-   glm::vec2 ru, lu, ld, rd;
-};
 
 namespace collision {
    bool point_is_inside(glm::vec2 p, Object &obj){
@@ -53,7 +50,7 @@ namespace collision {
       }
       return 0;
    }
-   collider get_collider_rect(Object obj){
+   collider_rect get_collider_rect(Object obj){
       glm::vec2 ru, lu, ld, rd;
       glm::vec3 sz = obj.size, pos = obj.pos;
 
@@ -65,8 +62,7 @@ namespace collision {
    }
 
    bool AABB(Object x, Object y){
-      collider a, b; 
-
+      collider_rect a, b; 
       a = get_collider_rect(x), 
       b = get_collider_rect(y);
       return  a.ld.x <= b.ru.x &&

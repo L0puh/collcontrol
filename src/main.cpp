@@ -39,11 +39,16 @@ int main() {
    while (!glfwWindowShouldClose(window)){
       renderer.update();
          
-      if ((state.keys[GLFW_MOUSE_BUTTON_LEFT] && glfwGetTime()-last_press >= state.cooldown)  || edit_flag){
+      if (((state.keys[GLFW_MOUSE_BUTTON_LEFT] && glfwGetTime()-last_press >= state.cooldown) || edit_flag) || !state.imgui_focused){
          glm::vec2 pos = camera.get_mouse_pos();
          for (int i = objects.size()-1; i >= 0; i--){
             if (collision::point_is_inside(pos, objects.at(i))){
-               if (state.keys[GLFW_MOUSE_BUTTON_LEFT]&& glfwGetTime()-last_press >= state.cooldown){ 
+               //delete object. FIXME later (provide separate loop for these things...)
+               if (state.keys[GLFW_KEY_D]) {
+                  objects.erase((std::vector<Object>::iterator)&objects.at(i));
+                  break;
+               }
+               else if (state.keys[GLFW_MOUSE_BUTTON_LEFT]&& glfwGetTime()-last_press >= state.cooldown){ 
                   last_press = glfwGetTime();
                   if (edit_flag && !state.imgui_focused) edit_flag = 0;
                   else{

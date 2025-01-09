@@ -236,6 +236,9 @@ class Object {
          this->angle = angle;
          this->rotation_pos = pos;
       }
+      void set_color(glm::vec3 color) {
+         this->color = color; 
+      }
       void set_color(const GLfloat *color) { 
          this->color = glm::vec3(color[0], color[1], color[2]); 
       }
@@ -269,14 +272,15 @@ class Renderer {
       void set_objects(std::vector<Object> *objects) {this->objects = objects;}
       void draw_objects(std::vector<Object>*objects);
       void add_shape(Shape *shape){ shapes.push_back(shape); }
-      void drag_drop(std::vector<Object> *objects);
+      void drag_and_drop(std::vector<Object> *objects);
 };
 
 
 namespace collision {
+   struct collider_rect { glm::vec2 ru, lu, ld, rd; };
    bool point_is_inside(glm::vec2 pos, Object &obj);
    bool AABB(Object x, Object y);
-      
+   collider_rect get_collider_rect(Object obj);
 };
 
 namespace imgui {
