@@ -1,5 +1,4 @@
 #include "collcontrol.hpp"
-#include "input.hpp"
 #include <GLFW/glfw3.h>
 #include <cmath>
 #include <vector>
@@ -20,48 +19,23 @@ int main() {
    memcpy(state.bg_color, color::blue, 
          sizeof(color::blue));
 
-      
-   Shape rect(shape_type::rectangle), triag(shape_type::triangle), 
+   Shape rect(shape_type::rectangle), 
+         triag(shape_type::triangle), 
          circle(shape_type::circle);
+   
    std::vector<Object> objects;
-   state.last_frame = 0.0f;
-   state.cooldown = 0.5f;
    state.camera = &camera;
    state.renderer = &renderer;
+   
    renderer.add_shape(&rect);
    renderer.add_shape(&triag);
    renderer.add_shape(&circle);
    renderer.set_objects(&objects);
-   
-   bool edit_flag = 0;
-   int edit_object = -1;
-   float last_press = 0.0f;
+  
+   state.current_collision_type |= COLLISION_FLAG_AABB;
    while (!glfwWindowShouldClose(window)){
       renderer.update();
-         
-      if (((state.keys[GLFW_MOUSE_BUTTON_LEFT] && glfwGetTime()-last_press >= state.cooldown) || edit_flag) || !state.imgui_focused){
-         glm::vec2 pos = camera.get_mouse_pos();
-         for (int i = objects.size()-1; i >= 0; i--){
-            if (collision::point_is_inside(pos, objects.at(i))){
-               //delete object. FIXME later (provide separate loop for these things...)
-               if (state.keys[GLFW_KEY_D]) {
-                  objects.erase((std::vector<Object>::iterator)&objects.at(i));
-                  break;
-               }
-               else if (state.keys[GLFW_MOUSE_BUTTON_LEFT]&& glfwGetTime()-last_press >= state.cooldown){ 
-                  last_press = glfwGetTime();
-                  if (edit_flag && !state.imgui_focused) edit_flag = 0;
-                  else{
-                     edit_flag = 1;
-                     edit_object = objects.at(i).id;
-                  }
-               }  
-            }
-            if (edit_flag && edit_object == objects.at(i).id)
-               imgui::edit_object(&objects.at(i));
-         }
-      }
-
+      renderer.objects_loop(&objects);   
       check_collisions_FIXME(&objects);
       renderer.render(&objects);
    }

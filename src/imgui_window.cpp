@@ -48,6 +48,7 @@ namespace imgui {
       float color[3] = {obj->color.x, obj->color.y, obj->color.z};
       ImGui::Text("EDIT CIRCLE");
       ImGui::SliderFloat("RADIUS##", &obj->radius, 0, 5.0f, "%.5f", 0);
+      ImGui::SliderFloat2("SIZE##", &obj->size.x, 0, 5.0f, "%.5f", 0);
       ImGui::ColorEdit3("COLOR:##", color, 0);
       ImGui::SliderFloat2("POS:##", &obj->pos.x, -10, 10.0f, "%.5f", 0);
       ImGui::SliderFloat2("CENTER POS:##", &obj->center.y, -1.0f, 1.0f, "%.9f", 0);
@@ -56,6 +57,7 @@ namespace imgui {
    void edit_object(Object *obj){
       ImGui::Begin("main", 0, ImGuiWindowFlags_AlwaysAutoResize);
       ImGui::PushID(obj->id);
+
       if (obj->shape->type == shape_type::circle){
          edit_circle(obj);
       } else {
@@ -69,9 +71,7 @@ namespace imgui {
       float color[3] = {obj->color.x, obj->color.y, obj->color.z};
       ImGui::Text("EDIT QUAD");
       ImGui::ColorEdit3("COLOR:##", color, 1);
-      float sz[2] = {obj->size.x, obj->size.y};
-      ImGui::SliderFloat2("SIZE##", sz, 0, 5.0f, "%.5f", 0);
-      obj->size = {sz[0], sz[1], 0.0f};
+      ImGui::SliderFloat2("SIZE##", &obj->size.x, 0, 5.0f, "%.5f", 0);
       ImGui::SliderFloat2("POS:##", &obj->pos.x, -10, 10.0f, "%.5f", 0);
       ImGui::SliderFloat("ANGLE:##", &obj->angle, 0, 90.0f, "%.10f", 0);
       obj->color = {color[0], color[1], color[2]};

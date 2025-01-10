@@ -29,6 +29,7 @@
 #define CAMERA_MOVE    0b0010
 #define CAMERA_CHANGED 0b0001
 
+#define COLLISION_FLAG_AABB  0b1000
 
 namespace color {
    const GLfloat blue[]   = {0.0f, 0.0f, 1.0f, 1.0f};
@@ -257,7 +258,6 @@ class Object {
 class Renderer {
    Camera *camera;
    GLFWwindow *window;
-   int current_id = -1;
    glm::vec2 last_pos; 
    
    std::vector<Shape*> shapes;
@@ -267,12 +267,18 @@ class Renderer {
                   camera(cam), window(win){}
    public:
       void render(std::vector<Object> *objects);
-      void create_new_object(shape_type type, glm::vec2 pos);
       void update();
+      void add_shape(Shape *shape){ shapes.push_back(shape); }
+
+   public: //objects 
+      void objects_loop(std::vector<Object> *objects);
+      void edit_object(Object *object);
+      void drag_and_drop(Object *object);
+      int  delete_object(Object *object);
+      
+      void create_new_object(shape_type type, glm::vec2 pos);
       void set_objects(std::vector<Object> *objects) {this->objects = objects;}
       void draw_objects(std::vector<Object>*objects);
-      void add_shape(Shape *shape){ shapes.push_back(shape); }
-      void drag_and_drop(std::vector<Object> *objects);
 };
 
 
