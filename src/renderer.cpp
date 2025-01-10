@@ -32,7 +32,7 @@ void check_collisions_FIXME(std::vector<Object> *objects){
    for(int i = 0; i < objects->size(); i++){
       for(int j = i+1; j < objects->size(); j++){
          if (state.current_collision_type & COLLISION_FLAG_AABB){
-            if (collision::AABB(objects->at(i), objects->at(j))){
+            if (collision::rect_rect(objects->at(i), objects->at(j))){
                objects->at(i).set_color(color::red);
             } else {
                objects->at(i).set_color(color::green);

@@ -285,7 +285,7 @@ class Renderer {
 namespace collision {
    struct collider_rect { glm::vec2 ru, lu, ld, rd; };
    bool point_is_inside(glm::vec2 pos, Object &obj);
-   bool AABB(Object x, Object y);
+   bool rect_rect(Object x, Object y);
    collider_rect get_collider_rect(Object obj);
 };
 

@@ -61,7 +61,7 @@ namespace collision {
       return {ru, lu, ld, rd};
    }
 
-   bool AABB(Object x, Object y){
+   bool rect_rect(Object x, Object y){
       collider_rect a, b; 
       a = get_collider_rect(x), 
       b = get_collider_rect(y);
