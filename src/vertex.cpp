@@ -13,22 +13,22 @@ int Vertex::cleanup(){
    return 0;
 }
 
-int Vertex::create_VBO(const void* data, size_t size){
+int Vertex::create_VBO(const void* data, size_t size, GLenum type){
    bind();
 
    glGenBuffers(1, &VBO);
    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-   glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+   glBufferData(GL_ARRAY_BUFFER, size, data, type);
 
    return VBO;
 }
 
-int Vertex::create_EBO(const void* data, size_t size){
+int Vertex::create_EBO(const void* data, size_t size, GLenum type){
    bind();
 
    glGenBuffers(1, &EBO);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-   glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, type);
 
    this->with_EBO = true;
 
@@ -48,7 +48,11 @@ int Vertex::draw_VBO(GLenum mode, size_t size){
    unbind();
    return 0;
 }
-
+void Vertex::update_data(const void *data, size_t sz){
+   bind();
+   glBufferSubData(GL_ARRAY_BUFFER, 0, sz, data);
+   unbind();
+}
 void Vertex::add_atrib(uint id, GLint size, GLenum type)
 {
    bind();

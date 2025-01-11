@@ -50,8 +50,8 @@ class Vertex {
       bool with_EBO = false;
    public:
       int create_VAO();
-      int create_EBO(const void* data, size_t);
-      int create_VBO(const void* data, size_t);
+      int create_EBO(const void* data, size_t, GLenum type=GL_STATIC_DRAW);
+      int create_VBO(const void* data, size_t, GLenum type=GL_STATIC_DRAW);
 
       void bind()   { glBindVertexArray(VAO);}
       void unbind() { glBindVertexArray(0);  }
@@ -59,6 +59,7 @@ class Vertex {
       void add_atrib(uint id, GLint size, GLenum type);
       int draw_EBO(GLenum mode, size_t size);
       int draw_VBO(GLenum mode, size_t size);
+      void update_data(const void *data, size_t);
       int cleanup();
 };
 
@@ -103,9 +104,15 @@ class Shader {
 typedef enum {
    rectangle,
    triangle,
-   circle
+   circle,
+   line
 
 } shape_type;
+
+struct Line_t {
+   glm::vec2 start;
+   glm::vec2 end;
+};
 
 class Shape {
    public:
@@ -116,25 +123,35 @@ class Shape {
       Shader shader;
 
    public:
-      Shape(shape_type type): type(type)
+      Shape(shape_type type, Line_t line = {}): type(type)
       {
          set_shape(type);
          switch(type){
-            case circle:
+            case shape_type::circle:
                shader.init_shader("shaders/circle.vert", "shaders/circle.frag");
                vertex.create_VBO(vertices::rectangle, sizeof(vertices::rectangle));
                vertex.create_EBO(indices::rectangle, sizeof(indices::rectangle));
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
-            case rectangle:
+            case shape_type::rectangle:
                shader.init_shader("shaders/default.vert", "shaders/default.frag");
                vertex.create_VBO(vertices::rectangle, sizeof(vertices::rectangle));
                vertex.create_EBO(indices::rectangle, sizeof(indices::rectangle));
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
-            case triangle:
+            case shape_type::triangle:
                shader.init_shader("shaders/default.vert", "shaders/default.frag");
                vertex.create_VBO(vertices::triangle, sizeof(vertices::triangle));
+               vertex.add_atrib(0, 3, GL_FLOAT);
+               break;
+            case shape_type::line:
+               mode = GL_LINES; size = 2;
+               float vertices[] = {
+                  line.start.x, line.start.y, 0.0f, 
+                  line.end.x, line.end.y, 0.0f 
+               };
+               shader.init_shader("shaders/default.vert", "shaders/default.frag");
+               vertex.create_VBO(vertices, sizeof(vertices));
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
          }
@@ -149,11 +166,14 @@ class Shape {
          type = t;
          switch(type){
             case shape_type::triangle:
-               size = LEN(vertices::triangle);
-               break;
+              size = LEN(vertices::triangle);
+              break;
             case shape_type::rectangle:
             case shape_type::circle:
-               size = LEN(vertices::rectangle);
+              size = LEN(vertices::rectangle); 
+              break;
+            default:
+              size = 2;
               break;
          }
       }
@@ -217,7 +237,7 @@ class Object {
       uint8_t flags;
       Shader *shader;
       Shape  *shape;
-      
+     
       float angle = 0.0f;
       glm::mat4 model, view, proj;
       glm::vec3 pos, size, color, rotation_pos;

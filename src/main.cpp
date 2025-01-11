@@ -23,16 +23,25 @@ int main() {
          triag(shape_type::triangle), 
          circle(shape_type::circle);
    
+
    std::vector<Object> objects;
    state.camera = &camera;
    state.renderer = &renderer;
-   
+  
    renderer.add_shape(&rect);
    renderer.add_shape(&triag);
    renderer.add_shape(&circle);
    renderer.set_objects(&objects);
   
    state.current_collision_type |= COLLISION_FLAG_AABB;
+   
+
+   Line_t line = { glm::vec2(-1.0f, 0.0f), glm::vec2(0.0f, 3.0f)};
+   Shape line_shape(shape_type::line, line);
+   Object obj(0, &line_shape);
+   obj.set_color(color::yellow);
+   obj.set_pos({0.0, 0.0, 0.0});
+   objects.push_back(obj);
    while (!glfwWindowShouldClose(window)){
       renderer.update();
       renderer.objects_loop(&objects);   

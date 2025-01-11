@@ -13,6 +13,7 @@ done
 if [ ! -d "$BUILDDIR" ]; then
    echo " + creating build folder..."
    mkdir -p build
+   cd build
    if [ $IS_VERBOSE == 1 ]; then
       cmake ..
    else 

@@ -2,10 +2,11 @@
 #include <vector>
 
 void Renderer::update() {
+   glClearBufferfv(GL_COLOR, 0, state.bg_color);   
+   
    imgui::frame();
    imgui::draw_main();
 
-   glClearBufferfv(GL_COLOR, 0, state.bg_color);   
    update_deltatime();
    camera->update();
    imgui::create_objects_popup();
@@ -41,7 +42,6 @@ void check_collisions_FIXME(std::vector<Object> *objects){
       }
    }
 }
-
 
 void Renderer::draw_objects(std::vector<Object>*objects){
    for(int i = 0; i < objects->size(); ++i){
