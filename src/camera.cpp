@@ -1,5 +1,6 @@
 
 #include "collcontrol.hpp"
+#include "glm/ext/matrix_projection.hpp"
 #include "input.hpp"
 #include <GLFW/glfw3.h>
 
@@ -29,7 +30,7 @@ glm::vec2 Camera::project(double x, double y) {
    double normx, normy;
    normx = (x / window_width ) *  2.0f - 1.0f; 
    normy = (y / window_height) * -2.0f + 1.0f; 
-   glm::mat4 proj = glm::inverse(get_projection());
+   glm::mat4 proj = inverse(get_projection() * get_view());
    glm::vec4 world = glm::vec4(normx, normy, 1.0f, 1.0f) * proj;
    return world;
 }

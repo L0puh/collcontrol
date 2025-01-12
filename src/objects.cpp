@@ -19,6 +19,10 @@ void Object::draw(glm::mat4 proj, glm::mat4 view) {
       shader->set_float("_radius", radius/size.x);
       shader->set_vec2("_resolution", state.camera->get_window_size());
    }
+   if (shape->type == shape_type::line){
+      shader->set_vec2("_start", shape->line.start);
+      shader->set_vec2("_end", shape->line.end);
+   }
 
    shape->draw();
    shader->unuse();

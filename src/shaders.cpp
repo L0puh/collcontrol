@@ -4,17 +4,22 @@
 #include <fstream>
 #include <sstream>
 
-Shader::Shader(std::string vert_src, std::string frag_src) {
-   init_shader(vert_src, frag_src);
+Shader::Shader(std::string vert_src, std::string frag_src, std::string geom_src) {
+   init_shader(vert_src, frag_src, geom_src);
 }
-void Shader::init_shader(std::string vert_src, std::string frag_src){
-   uint vtx, frg;
+void Shader::init_shader(std::string vert_src, std::string frag_src, std::string geom_src){
+   uint vtx, frg, geom;
 
    compile(&vtx, vert_src, GL_VERTEX_SHADER);
    compile(&frg, frag_src, GL_FRAGMENT_SHADER);
-
    id = glCreateProgram();
-   link(vtx, frg);
+   if (!geom_src.empty()){
+      compile(&geom, geom_src, GL_GEOMETRY_SHADER);
+      link(vtx, frg, geom);
+      glDeleteShader(geom);
+   } else {
+      link(vtx, frg);
+   }
    glDeleteShader(vtx);
    glDeleteShader(frg);
 }
@@ -65,10 +70,30 @@ void Shader::compile(uint *shader, std::string src, GLenum type){
    if (shader == NULL) error_and_exit("no shader provided");
    *shader = sh;
    
-   log_info("load shader");
+   char* msg = (char*)malloc(512 * 2);
+   sprintf(msg, "file shader (%s) is loaded", src.c_str());
+   log_info(msg);
+   free(msg);
    return;
 }
 
+void Shader::link(uint vrt, uint frag, uint geom){
+   int res; char info[512];
+
+   glAttachShader(id, vrt);
+   glAttachShader(id, geom);
+   glAttachShader(id, frag);
+   glLinkProgram(id);
+   
+   glGetProgramiv(id, GL_LINK_STATUS, &res);
+   if (!res) {
+      glGetProgramInfoLog(id, 512, NULL, info);
+      error_and_exit(info);
+   } 
+   log_info("link shader");
+   return;
+
+}
 void Shader::link(uint vrt, uint frag){
    int res; char info[512];
 

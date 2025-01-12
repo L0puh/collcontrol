@@ -70,14 +70,16 @@ class Shader {
 
    public:
       Shader() {};
-      Shader(std::string vert_src, std::string frag_src);
+      Shader(std::string vert_src, std::string frag_src, std::string geom_src="");
       ~Shader();
 
    public:
       void compile(uint *shader, std::string src, GLenum type);
+      void link(uint vrt, uint frag, uint geom);
       void link(uint vrt, uint frag);
-      void init_shader(std::string vert_src, std::string frag_src);
-
+      void init_shader(std::string vert_src, 
+                        std::string frag_src, 
+                        std::string geom_src="");
       void cleanup();
       std::string load_src(std::string&);
 
@@ -121,9 +123,10 @@ class Shape {
       shape_type type; 
       GLenum mode = GL_TRIANGLES;
       Shader shader;
+      Line_t line;
 
    public:
-      Shape(shape_type type, Line_t line = {}): type(type)
+      Shape(shape_type type, Line_t line = {}): type(type), line(line)
       {
          set_shape(type);
          switch(type){
@@ -145,13 +148,12 @@ class Shape {
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
             case shape_type::line:
-               mode = GL_LINES; size = 2;
-               float vertices[] = {
-                  line.start.x, line.start.y, 0.0f, 
-                  line.end.x, line.end.y, 0.0f 
-               };
-               shader.init_shader("shaders/default.vert", "shaders/default.frag");
-               vertex.create_VBO(vertices, sizeof(vertices));
+               mode = GL_POINTS;
+               shader.init_shader("shaders/default.vert",
+                                 "shaders/default.frag",
+                                 "shaders/default.geom");
+
+               vertex.create_VBO(vertices::line, sizeof(vertices::line));
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
          }
@@ -262,6 +264,9 @@ class Object {
       }
       void set_color(const GLfloat *color) { 
          this->color = glm::vec3(color[0], color[1], color[2]); 
+      }
+      void set_line(Line_t line){
+         this->shape->line = line;
       }
       
       void update() { model = glm::mat4(1.0f); }
