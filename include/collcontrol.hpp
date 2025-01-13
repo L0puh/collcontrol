@@ -287,15 +287,19 @@ class Renderer {
    
    std::vector<Shape*> shapes;
    std::vector<Object> *objects;
+
+   Object *line;
    public:
       Renderer(Camera *cam, GLFWwindow *win): 
-                  camera(cam), window(win){}
+               camera(cam), window(win){}
    public:
       void render(std::vector<Object> *objects);
       void update();
       void add_shape(Shape *shape){ shapes.push_back(shape); }
 
    public: //objects 
+           
+      void add_line(Object *line) {this->line = line;} //FIXME
       void objects_loop(std::vector<Object> *objects);
       void edit_object(Object *object);
       void drag_and_drop(Object *object);

@@ -35,19 +35,15 @@ int main() {
   
    state.current_collision_type |= COLLISION_FLAG_AABB;
   
-   Line_t line = { glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f)};
-   Shape line_shape(shape_type::line, line);
+   Shape line_shape(shape_type::line, {});
    Object obj(0, &line_shape);
    obj.set_color(color::green);
    obj.set_pos({0.0, 0.0, 0.0});
-   objects.push_back(obj);
-  
+   renderer.add_line(&obj); 
    while (!glfwWindowShouldClose(window)){
       renderer.update();
       renderer.objects_loop(&objects);   
       check_collisions_FIXME(&objects);
-      line = { -camera.get_mouse_pos(), glm::vec2(0.0f, 0.0f), };
-      objects.at(0).set_line(line);
       renderer.render(&objects);
    }
    

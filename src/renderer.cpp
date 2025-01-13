@@ -44,9 +44,23 @@ void check_collisions_FIXME(std::vector<Object> *objects){
 }
 
 void Renderer::draw_objects(std::vector<Object>*objects){
+   bool found_circle = 0;
+   glm::vec3 last_pos;
+   float last_radius = 0.0f;
    for(int i = 0; i < objects->size(); ++i){
       Object obj = objects->at(i);
       obj.draw(camera->get_projection(), camera->get_view());
+
+      if (obj.shape->type == shape_type::circle && found_circle){
+         found_circle = 0;  
+         line->set_line({obj.pos, last_pos});
+         line->set_color(color::green);
+         line->draw(camera->get_projection(), camera->get_view());
+      } else if (obj.shape->type == shape_type::circle){
+         last_pos = obj.pos;
+         last_radius = obj.radius;
+         found_circle = 1;
+      }
    }
 }
 

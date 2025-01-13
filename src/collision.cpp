@@ -69,7 +69,7 @@ namespace collision {
               a.ru.x >= b.ld.x &&
               a.ld.y <= b.ru.y &&
               a.ru.y >= b.ld.y;
-      
+
    }
       
 };
