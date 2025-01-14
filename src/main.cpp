@@ -23,7 +23,6 @@ int main() {
          triag(shape_type::triangle), 
          circle(shape_type::circle);
    
-
    std::vector<Object> objects;
    state.camera = &camera;
    state.renderer = &renderer;
@@ -32,14 +31,7 @@ int main() {
    renderer.add_shape(&triag);
    renderer.add_shape(&circle);
    renderer.set_objects(&objects);
-  
    state.current_collision_type |= COLLISION_FLAG_AABB;
-  
-   Shape line_shape(shape_type::line, {});
-   Object obj(0, &line_shape);
-   obj.set_color(color::green);
-   obj.set_pos({0.0, 0.0, 0.0});
-   renderer.add_line(&obj); 
    while (!glfwWindowShouldClose(window)){
       renderer.update();
       renderer.objects_loop(&objects);   

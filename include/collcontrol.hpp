@@ -123,10 +123,9 @@ class Shape {
       shape_type type; 
       GLenum mode = GL_TRIANGLES;
       Shader shader;
-      Line_t line;
 
    public:
-      Shape(shape_type type, Line_t line = {}): type(type), line(line)
+      Shape(shape_type type, Line_t line={}): type(type)
       {
          set_shape(type);
          switch(type){
@@ -148,12 +147,15 @@ class Shape {
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
             case shape_type::line:
-               mode = GL_POINTS;
                shader.init_shader("shaders/default.vert",
-                                 "shaders/default.frag",
-                                 "shaders/default.geom");
-
-               vertex.create_VBO(vertices::line, sizeof(vertices::line));
+                                  "shaders/default.frag");
+               glm::vec2 p0 = line.start; 
+               glm::vec2 p1 = line.end; 
+               const float vertices[] = {
+                  p0.x, p0.y, 0.0f,
+                  p1.x, p1.y, 0.0f
+               };
+               vertex.create_VBO(vertices, sizeof(vertices));
                vertex.add_atrib(0, 3, GL_FLOAT);
                break;
          }
@@ -175,7 +177,8 @@ class Shape {
               size = LEN(vertices::rectangle); 
               break;
             default:
-              size = 2;
+              mode = GL_LINES;
+              size = LEN(vertices::line);
               break;
          }
       }
@@ -265,10 +268,6 @@ class Object {
       void set_color(const GLfloat *color) { 
          this->color = glm::vec3(color[0], color[1], color[2]); 
       }
-      void set_line(Line_t line){
-         this->shape->line = line;
-      }
-      
       void update() { model = glm::mat4(1.0f); }
       void draw(glm::mat4 proj, glm::mat4 view);
 
@@ -288,7 +287,6 @@ class Renderer {
    std::vector<Shape*> shapes;
    std::vector<Object> *objects;
 
-   Object *line;
    public:
       Renderer(Camera *cam, GLFWwindow *win): 
                camera(cam), window(win){}
@@ -298,8 +296,8 @@ class Renderer {
       void add_shape(Shape *shape){ shapes.push_back(shape); }
 
    public: //objects 
-           
-      void add_line(Object *line) {this->line = line;} //FIXME
+      
+      void draw_line(glm::vec3 p0, glm::vec3 p1, const GLfloat *color, GLfloat thickness=1.0f);
       void objects_loop(std::vector<Object> *objects);
       void edit_object(Object *object);
       void drag_and_drop(Object *object);

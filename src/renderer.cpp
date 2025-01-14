@@ -53,9 +53,7 @@ void Renderer::draw_objects(std::vector<Object>*objects){
 
       if (obj.shape->type == shape_type::circle && found_circle){
          found_circle = 0;  
-         line->set_line({obj.pos, last_pos});
-         line->set_color(color::green);
-         line->draw(camera->get_projection(), camera->get_view());
+         draw_line(obj.pos, last_pos, color::black, 3.3f);
       } else if (obj.shape->type == shape_type::circle){
          last_pos = obj.pos;
          last_radius = obj.radius;
@@ -101,6 +99,16 @@ void Renderer::objects_loop(std::vector<Object> *objects){
          edit_object(&objects->at(i));
          drag_and_drop(&objects->at(i));
       }
+}
+
+void Renderer::draw_line(glm::vec3 p0, glm::vec3 p1, const GLfloat *color, GLfloat thickness){
+   glLineWidth(thickness); 
+   Shape line_shape(shape_type::line, {p0, p1});
+   Object line(0, &line_shape);
+   line.set_color(color);
+   line.draw(camera->get_projection(), camera->get_view());
+   glLineWidth(1.0f); 
+      
 }
 
 void Renderer::drag_and_drop(Object *obj){
