@@ -1,8 +1,5 @@
-
 #include "collcontrol.hpp"
-#include "glm/ext/matrix_projection.hpp"
 #include "input.hpp"
-#include <GLFW/glfw3.h>
 
 glm::mat4 Camera::get_projection() {
    float aspect = (float)window_width/window_height;

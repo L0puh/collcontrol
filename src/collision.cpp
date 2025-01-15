@@ -1,5 +1,5 @@
 #include "collcontrol.hpp"
-
+#include "glm/geometric.hpp"
 
 namespace collision {
    bool point_is_inside(glm::vec2 p, Object &obj){
@@ -50,7 +50,7 @@ namespace collision {
       }
       return 0;
    }
-   collider_rect get_collider_rect(Object obj){
+   collider_rect get_collider_rect(Object &obj){
       glm::vec2 ru, lu, ld, rd;
       glm::vec3 sz = obj.size, pos = obj.pos;
 
@@ -61,7 +61,7 @@ namespace collision {
       return {ru, lu, ld, rd};
    }
 
-   bool rect_rect(Object x, Object y){
+   bool rect_rect(Object &x, Object &y){
       collider_rect a, b; 
       a = get_collider_rect(x), 
       b = get_collider_rect(y);
@@ -69,7 +69,16 @@ namespace collision {
               a.ru.x >= b.ld.x &&
               a.ld.y <= b.ru.y &&
               a.ru.y >= b.ld.y;
+   }
+   bool circle_circle(Object &x, Object &y){
+      float dx, dy, dist, smr;
+      
+      dx = x.pos.x - y.pos.x;
+      dy = x.pos.y - y.pos.y;
+      dist = (dx * dx) + (dy * dy);
+      smr = x.radius + y.radius;
 
+      return dist <= smr * smr;
    }
       
 };

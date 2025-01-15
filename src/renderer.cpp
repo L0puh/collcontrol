@@ -32,7 +32,16 @@ void Renderer::create_new_object(shape_type type, glm::vec2 pos){
 void check_collisions_FIXME(std::vector<Object> *objects){
    for(int i = 0; i < objects->size(); i++){
       for(int j = i+1; j < objects->size(); j++){
-         if (state.current_collision_type & COLLISION_FLAG_AABB){
+         if (objects->at(i).shape->type == shape_type::circle &&
+               objects->at(j).shape->type == shape_type::circle){
+            if (collision::circle_circle(objects->at(i), objects->at(j))){
+               objects->at(i).set_color(color::red);
+            } else {
+               objects->at(i).set_color(color::green);
+            }
+
+         }
+         else if (state.current_collision_type & COLLISION_FLAG_AABB){
             if (collision::rect_rect(objects->at(i), objects->at(j))){
                objects->at(i).set_color(color::red);
             } else {
@@ -44,21 +53,9 @@ void check_collisions_FIXME(std::vector<Object> *objects){
 }
 
 void Renderer::draw_objects(std::vector<Object>*objects){
-   bool found_circle = 0;
-   glm::vec3 last_pos;
-   float last_radius = 0.0f;
    for(int i = 0; i < objects->size(); ++i){
       Object obj = objects->at(i);
       obj.draw(camera->get_projection(), camera->get_view());
-
-      if (obj.shape->type == shape_type::circle && found_circle){
-         found_circle = 0;  
-         draw_line(obj.pos, last_pos, color::black, 3.3f);
-      } else if (obj.shape->type == shape_type::circle){
-         last_pos = obj.pos;
-         last_radius = obj.radius;
-         found_circle = 1;
-      }
    }
 }
 

@@ -11,9 +11,10 @@ void main() {
 
    float alpha = 0.0;
    vec4 centerNDC = _mpv * vec4(_center, 1.0f, 1.0f);
-   vec2 uv = gl_FragCoord.xy/_resolution * 2.0f - 1.0f;
 
-   if (distance(uv, centerNDC.xy) <= _radius){
+   vec2 uv = (gl_FragCoord.xy/_resolution) * 2.0f - 1.0f;
+   
+   if (distance(uv.xy, centerNDC.xy) <= _radius){
       color = vec4(_color, 1.0f);
    } else
       color = vec4(0.0, 0.0, 0.0, 0.0f);
