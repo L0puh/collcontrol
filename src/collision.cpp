@@ -76,7 +76,7 @@ namespace collision {
       dx = x.pos.x - y.pos.x;
       dy = x.pos.y - y.pos.y;
       dist = (dx * dx) + (dy * dy);
-      smr = x.radius + y.radius;
+      smr = (x.size.x + y.size.x)/2.5f;
 
       return dist <= smr * smr;
    }

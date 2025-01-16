@@ -247,17 +247,18 @@ class Object {
       glm::mat4 model, view, proj;
       glm::vec3 pos, size, color, rotation_pos;
       glm::vec2 center = {0.0f, 0.0};
-      float radius = 0.5f;
-
+      float radius = 0.25f;
 
    public:
       Object(int id, Shape *shape): shader(&shape->shader), shape(shape), id(id) {};
       ~Object() {};
 
    public:
-     
       void set_pos(glm::vec3 pos) { this->pos = pos; }
-      void set_size(glm::vec3 size) { this->size = size; }
+      void set_size(glm::vec3 size) { 
+         this->radius = size.x * 0.25;
+         this->size = size; 
+      }
       void set_rotation(float angle, glm::vec3 pos) { 
          this->angle = angle;
          this->rotation_pos = pos;
