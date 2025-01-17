@@ -24,12 +24,7 @@
 
 #define LEN(n) sizeof(n)/sizeof(n[0])
 
-#define CAMERA_3D      0b1000
-#define CAMERA_FIXED   0b0100
-#define CAMERA_MOVE    0b0010
-#define CAMERA_CHANGED 0b0001
 
-#define COLLISION_FLAG_AABB  0b1000
 
 namespace color {
    const GLfloat blue[]   = {0.0f, 0.0f, 1.0f, 1.0f};

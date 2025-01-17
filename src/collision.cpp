@@ -1,4 +1,5 @@
 #include "collcontrol.hpp"
+#include "glm/common.hpp"
 #include "glm/geometric.hpp"
 
 namespace collision {
@@ -58,6 +59,7 @@ namespace collision {
       ru = {pos.x + sz.x/2.0f, pos.y + sz.y/2.0f};
       lu = {ld.x, ru.y};
       rd = {ru.x, ld.y};
+
       return {ru, lu, ld, rd};
    }
 

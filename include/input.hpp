@@ -19,12 +19,12 @@ namespace input {
          state.keys[key]=0;
       if (key == GLFW_MOUSE_BUTTON_LEFT) {
          if (action == GLFW_PRESS){
-            if (!state.mouse_clicked) state.mouse_clicked_changed = 1;
-            state.mouse_clicked = 1;
+            if (!(state.global_state & MOUSE_CLICKED)) state.global_state |= MOUSE_CHANGED;
+            state.global_state |= MOUSE_CLICKED;
          } else if (action == GLFW_RELEASE){
-            if (state.mouse_clicked) state.mouse_clicked_changed = 1;
-            else state.mouse_clicked_changed = 0;
-            state.mouse_clicked = 0;
+            if (state.global_state & MOUSE_CLICKED) state.global_state |= MOUSE_CHANGED;
+            else state.global_state ^= MOUSE_CHANGED;;
+            state.global_state ^= MOUSE_CLICKED;
          }
       }
    }

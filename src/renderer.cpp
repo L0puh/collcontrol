@@ -94,22 +94,22 @@ int Renderer::delete_object(Object *object){
 void Renderer::edit_object(Object *object){
    bool t;
    t = glfwGetTime() - state.last_press >= state.cooldown;
-   if ((state.keys[GLFW_KEY_E] && t) || state.edit_flag){
+   if ((state.keys[GLFW_KEY_E] && t) || state.global_state & EDITING){
          glm::vec2 pos = camera->get_mouse_pos();
          if (collision::point_is_inside(pos, *object)){
                if (state.keys[GLFW_KEY_E] && t){ 
                   state.last_press = glfwGetTime();
-                  if (state.edit_flag && !state.imgui_focused) {
-                     state.edit_flag = 0;
+                  if (!(state.global_state & IMGUI_FOCUSED) && state.global_state & EDITING) {
+                     state.global_state ^= EDITING;
                      state.current_edited_id = -1;
                   }
                   else {
-                     state.edit_flag = 1;
+                     state.global_state |= EDITING;
                      state.current_edited_id = object->id;
                   }
                }  
             }
-         if (state.edit_flag && state.current_edited_id == object->id)
+         if (state.global_state & EDITING && state.current_edited_id == object->id)
             imgui::edit_object(object);
    }
 }
@@ -137,15 +137,16 @@ void Renderer::drag_and_drop(Object *obj){
    
    campos = camera->get_mouse_pos();
    is_inside = collision::point_is_inside(camera->get_mouse_pos(), *obj);
-   if (is_inside && state.mouse_clicked && state.mouse_clicked_changed && !state.imgui_focused){
+   if (is_inside && (state.global_state & MOUSE_CLICKED) && (state.global_state
+               & MOUSE_CHANGED) && !(state.global_state & IMGUI_FOCUSED)){
       last_pos = { campos.x - obj->pos.x, campos.y - obj->pos.y};
       state.current_dragged_id = obj->id;
-      state.mouse_clicked_changed = 0;
+      state.global_state ^= MOUSE_CHANGED;
    } 
-   if (state.mouse_clicked && !state.imgui_focused && state.current_dragged_id == obj->id){
+   if ((state.global_state & MOUSE_CLICKED) && !(state.global_state & IMGUI_FOCUSED) && state.current_dragged_id == obj->id){
       obj->set_pos(glm::vec3((campos.x - last_pos.x), (campos.y - last_pos.y), 0.0f));
    } 
-   if (!state.mouse_clicked && state.current_dragged_id != -1) 
+   if (!(state.global_state & MOUSE_CLICKED) && state.current_dragged_id != -1) 
       state.current_dragged_id = -1;
 }
 

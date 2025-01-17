@@ -31,7 +31,6 @@ int main() {
    renderer.add_shape(&triag);
    renderer.add_shape(&circle);
    renderer.set_objects(&objects);
-   state.current_collision_type |= COLLISION_FLAG_AABB;
    while (!glfwWindowShouldClose(window)){
       renderer.update();
       renderer.objects_loop(&objects);   

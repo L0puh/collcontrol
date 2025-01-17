@@ -18,7 +18,7 @@ void Object::draw(glm::mat4 proj, glm::mat4 view) {
 
    if (shape->type == circle){
       shader->set_vec2("_center", center);
-      shader->set_float("_radius", radius/size.x);
+      shader->set_float("_radius", 0.5/size.x);
       shader->set_vec2("_resolution", state.camera->get_window_size());
    }
 

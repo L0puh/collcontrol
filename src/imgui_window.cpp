@@ -77,8 +77,12 @@ namespace imgui {
       obj->color = {color[0], color[1], color[2]};
    }
    void update_focused(){
-      state.imgui_focused = ImGui::IsWindowFocused() || ImGui::IsAnyItemFocused() ||
-                            ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive();
+      if (ImGui::IsWindowFocused() || ImGui::IsAnyItemFocused() ||
+                            ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive()){
+         state.global_state |= IMGUI_FOCUSED;
+      } else {
+         state.global_state ^= IMGUI_FOCUSED;
+      }
    }
 
    void create_objects_popup(){
