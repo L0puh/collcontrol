@@ -80,5 +80,20 @@ namespace collision {
 
       return dist <= smr * smr;
    }
+   bool circle_rect(Object &c, Object &r){
+      collider_rect a;
+      glm::vec2 closest = c.pos;
+
+      a = get_collider_rect(r);
+      closest.x = (closest.x < a.ld.x) ? a.ld.x: closest.x;
+      closest.y = (closest.y < a.ld.y) ? a.ld.y: closest.y;
+
+      closest.x = (closest.x > a.ru.x) ? a.ru.x: closest.x;
+      closest.y = (closest.y > a.ru.y) ? a.ru.y: closest.y;
+      
+      float dist = glm::distance(glm::vec2(c.pos), closest);
+      return dist <= c.size.y / 2.5f;
+
+   }
       
 };

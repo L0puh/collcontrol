@@ -316,6 +316,7 @@ namespace collision {
    bool rect_rect(Object &x, Object &y);
    collider_rect get_collider_rect(Object &obj);
    bool circle_circle(Object &x, Object &y);
+   bool circle_rect(Object &c, Object &r);
 };
 
 namespace imgui {

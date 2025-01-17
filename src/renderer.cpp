@@ -32,21 +32,44 @@ void Renderer::create_new_object(shape_type type, glm::vec2 pos){
 void check_collisions_FIXME(std::vector<Object> *objects){
    for(int i = 0; i < objects->size(); i++){
       for(int j = i+1; j < objects->size(); j++){
-         if (objects->at(i).shape->type == shape_type::circle &&
-               objects->at(j).shape->type == shape_type::circle){
-            if (collision::circle_circle(objects->at(i), objects->at(j))){
-               objects->at(i).set_color(color::red);
-            } else {
-               objects->at(i).set_color(color::green);
-            }
+         Object x = objects->at(j); 
+         switch(objects->at(i).shape->type){
+            case triangle:
+            case rectangle:
+               {
+                  if (x.shape->type == rectangle){
+                     if (collision::rect_rect(objects->at(i), objects->at(j)))
+                        objects->at(i).set_color(color::red);
+                     else 
+                        objects->at(i).set_color(color::green);
+                  }
+                  if (x.shape->type == circle){
+                     if (collision::circle_rect(objects->at(i), objects->at(j)))
+                        objects->at(i).set_color(color::red);
+                     else 
+                        objects->at(i).set_color(color::green);
+                  }
+                  break;
+               }
 
-         }
-         else if (state.current_collision_type & COLLISION_FLAG_AABB){
-            if (collision::rect_rect(objects->at(i), objects->at(j))){
-               objects->at(i).set_color(color::red);
-            } else {
-               objects->at(i).set_color(color::green);
-            }
+            case circle:
+               {
+                  if (x.shape->type == circle){
+                     if (collision::circle_circle(objects->at(i), objects->at(j)))
+                        objects->at(i).set_color(color::red);
+                     else 
+                        objects->at(i).set_color(color::green);
+                  }
+                  if (x.shape->type == rectangle){
+                     if (collision::circle_rect(objects->at(i), objects->at(j)))
+                        objects->at(i).set_color(color::red);
+                     else 
+                        objects->at(i).set_color(color::green);
+                  }
+                  break;
+               }
+            case line:
+              break;
          }
       }
    }
