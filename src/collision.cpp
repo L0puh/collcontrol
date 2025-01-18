@@ -1,6 +1,4 @@
 #include "collcontrol.hpp"
-#include "glm/common.hpp"
-#include "glm/geometric.hpp"
 
 namespace collision {
    bool point_is_inside(glm::vec2 p, Object &obj){
@@ -63,14 +61,58 @@ namespace collision {
       return {ru, lu, ld, rd};
    }
 
+   collider_triag get_collider_triag(Object &obj){
+      float d, l, u, r;
+      glm::vec2 up, rt, lt;
+      glm::vec3 pos = obj.pos, sz = obj.size;
+
+      up = {pos.x, pos.y + sz.y / 2.0f};
+      lt = {pos.x - sz.x / 2.0f, pos.y - sz.y / 2.0f};
+      rt = {pos.x + sz.x / 2.0f, pos.y - sz.y / 2.0f};
+
+      return {up, rt, lt};
+   }
+
    bool rect_rect(Object &x, Object &y){
       collider_rect a, b; 
+      
       a = get_collider_rect(x), 
       b = get_collider_rect(y);
+     
       return  a.ld.x <= b.ru.x &&
               a.ru.x >= b.ld.x &&
               a.ld.y <= b.ru.y &&
               a.ru.y >= b.ld.y;
+   }
+
+   bool convex(Object &x, Object &y){
+      
+
+      return 0;
+   }
+
+   bool detect_boundaries(Object &obj){
+      glm::vec2 screen, size, w;
+      
+      w = state.camera->get_window_size();
+      screen = state.camera->unproject(obj.pos);
+      size = obj.size / 2.0f;
+      return (screen.x - size.x <= 0 || screen.x + size.x >= w.x ||
+              screen.y - size.y <= 0 || screen.y + size.y >= w.y);
+   }
+
+   bool rect_triag(Object &r, Object &t){
+      collider_rect a;
+      collider_triag b; 
+      
+      a = get_collider_rect(r), 
+      b = get_collider_triag(t);
+    
+      // FIXME:
+      return  a.ld.x <= b.ru.x &&
+              a.ru.x >= b.lt.x &&
+              a.ld.y <= b.ru.y &&
+              a.ru.y >= b.lt.y;
    }
    bool circle_circle(Object &x, Object &y){
       float dx, dy, dist, smr;
@@ -83,6 +125,7 @@ namespace collision {
       return dist <= smr * smr;
    }
    bool circle_rect(Object &c, Object &r){
+      float dist;
       collider_rect a;
       glm::vec2 closest = c.pos;
 
@@ -93,7 +136,7 @@ namespace collision {
       closest.x = (closest.x > a.ru.x) ? a.ru.x: closest.x;
       closest.y = (closest.y > a.ru.y) ? a.ru.y: closest.y;
       
-      float dist = glm::distance(glm::vec2(c.pos), closest);
+      dist = glm::distance(glm::vec2(c.pos), closest);
       return dist <= c.size.y / 2.5f;
 
    }

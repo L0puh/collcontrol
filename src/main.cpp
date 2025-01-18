@@ -1,11 +1,7 @@
 #include "collcontrol.hpp"
-#include <GLFW/glfw3.h>
-#include <cmath>
-#include <vector>
 
 void enable_if_debug();
 void shutdown(GLFWwindow*);
-
 
 int main() {
    GLFWwindow *window = init_window(500, 500);
@@ -34,7 +30,7 @@ int main() {
    while (!glfwWindowShouldClose(window)){
       renderer.update();
       renderer.objects_loop(&objects);   
-      check_collisions_FIXME(&objects);
+      check_collisions(&objects);
       renderer.render(&objects);
    }
    

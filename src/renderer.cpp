@@ -1,5 +1,4 @@
 #include "collcontrol.hpp"
-#include <vector>
 
 void Renderer::update() {
    glClearBufferfv(GL_COLOR, 0, state.bg_color);   
@@ -29,12 +28,22 @@ void Renderer::create_new_object(shape_type type, glm::vec2 pos){
    objects->push_back(obj);
 }
 
-void check_collisions_FIXME(std::vector<Object> *objects){
+
+void check_collisions(std::vector<Object> *objects){
    for(int i = 0; i < objects->size(); i++){
       for(int j = i+1; j < objects->size(); j++){
          Object x = objects->at(j); 
          switch(objects->at(i).shape->type){
             case triangle:
+               {
+                  if (x.shape->type == rectangle){
+                     if (collision::rect_triag(objects->at(j), objects->at(i)))
+                        objects->at(i).set_color(color::red);
+                     else 
+                        objects->at(i).set_color(color::green);
+                  }
+               break;
+               }
             case rectangle:
                {
                   if (x.shape->type == rectangle){
@@ -45,6 +54,12 @@ void check_collisions_FIXME(std::vector<Object> *objects){
                   }
                   if (x.shape->type == circle){
                      if (collision::circle_rect(objects->at(i), objects->at(j)))
+                        objects->at(i).set_color(color::red);
+                     else 
+                        objects->at(i).set_color(color::green);
+                  }
+                  if (x.shape->type == triangle){
+                     if (collision::rect_triag(objects->at(i), objects->at(j)))
                         objects->at(i).set_color(color::red);
                      else 
                         objects->at(i).set_color(color::green);
@@ -113,11 +128,18 @@ void Renderer::edit_object(Object *object){
             imgui::edit_object(object);
    }
 }
+
+
 void Renderer::objects_loop(std::vector<Object> *objects){
       for (int i = objects->size()-1; i >= 0; i--){
+         if(collision::detect_boundaries(objects->at(i))){ 
+            // TODO: resolve boundaries, add direction (?)
+            continue;
+         }
          if (delete_object(&objects->at(i))) break;
          edit_object(&objects->at(i));
          drag_and_drop(&objects->at(i));
+         update_gravity(&objects->at(i));
       }
 }
 
@@ -129,6 +151,11 @@ void Renderer::draw_line(glm::vec3 p0, glm::vec3 p1, const GLfloat *color, GLflo
    line.draw(camera->get_projection(), camera->get_view());
    glLineWidth(1.0f); 
       
+}
+
+void Renderer::update_gravity(Object *obj){
+   obj->velocity += gravity * state.deltatime;
+   obj->pos += glm::vec3(obj->velocity * state.deltatime, 0.0f);
 }
 
 void Renderer::drag_and_drop(Object *obj){

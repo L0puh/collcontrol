@@ -23,6 +23,18 @@ void Camera::update_movement(){
    }
 }
 
+glm::vec2 Camera::unproject(glm::vec2 pos){
+    glm::vec4 world, screen;
+
+    world = glm::vec4(pos, 1.0f, 1.0f);
+    screen = get_projection() * get_view() * world;
+    screen /= screen.w;
+    screen.x = (screen.x + 1.0f) / 2.0f * window_width;
+    screen.y = (screen.y + 1.0f) / 2.0f * window_height;
+
+    return screen;
+}
+
 glm::vec2 Camera::project(double x, double y) {
    double normx, normy;
    normx = (x / window_width ) *  2.0f - 1.0f; 

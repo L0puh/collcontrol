@@ -208,6 +208,7 @@ class Camera {
          zoom(-3.0f){}
    public:
       void update_movement();
+      glm::vec2 unproject(glm::vec2 pos);
       glm::vec2 project(double x, double y);
       
       glm::vec2 get_mouse_pos();
@@ -241,8 +242,10 @@ class Object {
       float angle = 0.0f;
       glm::mat4 model, view, proj;
       glm::vec3 pos, size, color, rotation_pos;
-      glm::vec2 center = {0.0f, 0.0};
+      glm::vec2 center   = {0.0f, 0.0f};
+      glm::vec2 velocity = {0.0f, 0.0f};
       float radius = 0.25f;
+
 
    public:
       Object(int id, Shape *shape): shader(&shape->shader), shape(shape), id(id) {};
@@ -282,11 +285,14 @@ class Renderer {
    
    std::vector<Shape*> shapes;
    std::vector<Object> *objects;
+   
+   glm::vec2 gravity = {0.0f, 0.2f};
 
    public:
       Renderer(Camera *cam, GLFWwindow *win): 
                camera(cam), window(win){}
    public:
+
       void render(std::vector<Object> *objects);
       void update();
       void add_shape(Shape *shape){ shapes.push_back(shape); }
@@ -295,10 +301,11 @@ class Renderer {
       
       void draw_line(glm::vec3 p0, glm::vec3 p1, const GLfloat *color, GLfloat thickness=1.0f);
       void objects_loop(std::vector<Object> *objects);
+      void update_gravity(Object *obj);
       void edit_object(Object *object);
-      void drag_and_drop(Object *object);
       int  delete_object(Object *object);
       
+      void drag_and_drop(Object *object);
       void create_new_object(shape_type type, glm::vec2 pos);
       void set_objects(std::vector<Object> *objects) {this->objects = objects;}
       void draw_objects(std::vector<Object>*objects);
@@ -307,14 +314,20 @@ class Renderer {
 
 namespace collision {
    struct collider_rect { glm::vec2 ru, lu, ld, rd; };
+   struct collider_triag{ glm::vec2 ru, rt, lt; };
    bool point_is_inside(glm::vec2 pos, Object &obj);
-   bool rect_rect(Object &x, Object &y);
+   collider_triag get_collider_triag(Object &obj);
    collider_rect get_collider_rect(Object &obj);
+   
+   bool rect_rect(Object &x, Object &y);
    bool circle_circle(Object &x, Object &y);
    bool circle_rect(Object &c, Object &r);
+   bool rect_triag(Object &r, Object &t);
+   bool detect_boundaries(Object &obj);
 };
 
 namespace imgui {
+
    void init(GLFWwindow* window);
    void frame();
    void render();
@@ -330,9 +343,7 @@ namespace imgui {
 void debug_message_callback (GLenum, GLenum, GLuint, GLuint,
                             GLsizei, const GLchar*, const GLvoid*);
 void update_deltatime();
-
 GLFWwindow* init_window(int width, int height);
-
-void check_collisions_FIXME(std::vector<Object> *objects);
+void check_collisions(std::vector<Object> *objects);
 
 #endif 
