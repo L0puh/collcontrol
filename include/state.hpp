@@ -23,7 +23,7 @@ struct STATE {
    Camera *camera;
    Renderer *renderer;
    float bg_color[4];
-   float deltatime;
+   float deltatime  = 0.0f;
    float last_frame = 0.0f; // for deltatime
    float cooldown   = 0.4f; // seconds
    float last_press = 0.0f; // seconds 

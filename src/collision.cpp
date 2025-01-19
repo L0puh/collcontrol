@@ -91,12 +91,19 @@ namespace collision {
       return 0;
    }
 
-   bool detect_boundaries(Object &obj){
+   bool resolve_boundaries(Object *obj){
       glm::vec2 screen, size, w;
       
       w = state.camera->get_window_size();
-      screen = state.camera->unproject(obj.pos);
-      size = obj.size / 2.0f;
+      screen = state.camera->unproject(obj->pos);
+      size = obj->size / 2.0f;
+
+      if (screen.x - size.x <= 0 || screen.x + size.x >= w.x ){ 
+         obj->velocity.x *= -1;
+      }
+      if (screen.y - size.y <= 0 || screen.y + size.y >= w.y) {
+         obj->velocity.y *= -1;
+      }
       return (screen.x - size.x <= 0 || screen.x + size.x >= w.x ||
               screen.y - size.y <= 0 || screen.y + size.y >= w.y);
    }

@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <limits>
 #include <string>
 #include <sys/types.h>
 #include <unordered_map>
@@ -243,7 +244,7 @@ class Object {
       glm::mat4 model, view, proj;
       glm::vec3 pos, size, color, rotation_pos;
       glm::vec2 center   = {0.0f, 0.0f};
-      glm::vec2 velocity = {0.0f, 0.0f};
+      glm::vec2 velocity = {1.0f, 1.0f};
       float radius = 0.25f;
 
 
@@ -285,8 +286,9 @@ class Renderer {
    
    std::vector<Shape*> shapes;
    std::vector<Object> *objects;
-   
-   glm::vec2 gravity = {0.0f, 0.2f};
+  
+   public:
+      glm::vec2 gravity = {0.0f, 0.0f};
 
    public:
       Renderer(Camera *cam, GLFWwindow *win): 
@@ -323,7 +325,7 @@ namespace collision {
    bool circle_circle(Object &x, Object &y);
    bool circle_rect(Object &c, Object &r);
    bool rect_triag(Object &r, Object &t);
-   bool detect_boundaries(Object &obj);
+   bool resolve_boundaries(Object *obj);
 };
 
 namespace imgui {

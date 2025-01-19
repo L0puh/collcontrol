@@ -132,13 +132,10 @@ void Renderer::edit_object(Object *object){
 
 void Renderer::objects_loop(std::vector<Object> *objects){
       for (int i = objects->size()-1; i >= 0; i--){
-         if(collision::detect_boundaries(objects->at(i))){ 
-            // TODO: resolve boundaries, add direction (?)
-            continue;
-         }
          if (delete_object(&objects->at(i))) break;
          edit_object(&objects->at(i));
          drag_and_drop(&objects->at(i));
+         collision::resolve_boundaries(&objects->at(i));
          update_gravity(&objects->at(i));
       }
 }

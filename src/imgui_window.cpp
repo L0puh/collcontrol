@@ -34,6 +34,7 @@ namespace imgui {
          ImGui::Text("MOUSE COORDS: %.6f %.6f", mouse_pos.x, mouse_pos.y);
          ImGui::ColorEdit4("BG COLOR:", state.bg_color, 0);
          ImGui::Checkbox("MOVE CAMERA:", &is_move);
+         ImGui::SliderFloat2("GRAVITY:", &state.renderer->gravity.x, 0, 5.0f, "%.5f", 0);
       }
       ImGui::End();
       //it's a hack, FIXME later 
