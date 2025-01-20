@@ -1,4 +1,5 @@
 #include "collcontrol.hpp"
+#include "glm/ext/quaternion_geometric.hpp"
 
 namespace collision {
    bool point_is_inside(glm::vec2 p, Object &obj){
@@ -86,8 +87,6 @@ namespace collision {
    }
 
    bool convex(Object &x, Object &y){
-      
-
       return 0;
    }
 
@@ -121,20 +120,51 @@ namespace collision {
               a.ld.y <= b.ru.y &&
               a.ru.y >= b.lt.y;
    }
-   bool circle_circle(Object &x, Object &y){
-      float dx, dy, dist, smr;
+
+   void resolve_collisions(Object *x, Object *y){
+      collision_t coll;
+      if (x->shape->type == circle && y->shape->type == circle){
+         coll = circle_circle(*x, *y);
+         if (coll.is_collide){
+            x->velocity = coll.direction;
+            y->velocity = -coll.direction;
+         }
+      }
+      if (x->shape->type == rectangle && y->shape->type == circle){
+         coll = circle_rect(*x, *y);
+      }
+      if(x->shape->type == circle && y->shape->type == rectangle){
+         coll = circle_rect(*x, *y);
+      }
+      if (coll.is_collide){
+         x->velocity = coll.direction;
+         y->velocity = -coll.direction;
+      }
+   }
+   collision_t circle_circle(Object &x, Object &y){
+      bool is_collide;
+      glm::vec2 direction;
+      float dx, dy, dist, smr, angle;
       
       dx = x.pos.x - y.pos.x;
       dy = x.pos.y - y.pos.y;
       dist = (dx * dx) + (dy * dy);
       smr = (x.size.x + y.size.x)/2.5f;
-
-      return dist <= smr * smr;
+      
+      is_collide = dist <= smr * smr;
+      if (is_collide) {
+         angle = atan2(dy, dx);
+         direction.x = cos(angle);
+         direction.y = sin(angle);
+       } 
+      return {is_collide, direction};
    }
-   bool circle_rect(Object &c, Object &r){
-      float dist;
+
+   collision_t circle_rect(Object &c, Object &r){
+      bool is_collide;
       collider_rect a;
-      glm::vec2 closest = c.pos;
+      float dist, dx, dy, angle;
+      glm::vec2 closest = c.pos, dir;
 
       a = get_collider_rect(r);
       closest.x = (closest.x < a.ld.x) ? a.ld.x: closest.x;
@@ -144,8 +174,16 @@ namespace collision {
       closest.y = (closest.y > a.ru.y) ? a.ru.y: closest.y;
       
       dist = glm::distance(glm::vec2(c.pos), closest);
-      return dist <= c.size.y / 2.5f;
-
+      is_collide = dist <= c.size.y / 2.5f;
+      if (is_collide){
+         dx = c.pos.x - closest.x;
+         dy = c.pos.y - closest.y;
+         if (dx != 0 || dy != 0){
+            angle = atan2(dy, dx);
+            dir = {cos(angle), sin(angle)};
+         }
+      }
+      return {is_collide, dir};
    }
       
 };

@@ -37,6 +37,7 @@ namespace imgui {
          ImGui::SliderFloat2("GRAVITY:", &state.renderer->gravity.x, 0, 5.0f, "%.5f", 0);
       }
       ImGui::End();
+      
       //it's a hack, FIXME later 
       if (is_move && !(state.camera->flags & CAMERA_MOVE)){
          state.camera->set_flag(CAMERA_MOVE|CAMERA_CHANGED);
@@ -51,6 +52,7 @@ namespace imgui {
       float color[3] = {obj->color.x, obj->color.y, obj->color.z};
       ImGui::Text("EDIT CIRCLE");
       ImGui::SliderFloat("RADIUS##", &obj->radius, 0, 5.0f, "%.5f", 0);
+      ImGui::SliderFloat("SPEED##", &obj->speed, 0, 5.0f, "%.5f", 0);
       ImGui::SliderFloat2("SIZE##", &obj->size.x, 0, 5.0f, "%.5f", 0);
       ImGui::ColorEdit3("COLOR:##", color, 0);
       ImGui::SliderFloat2("POS:##", &obj->pos.x, -10, 10.0f, "%.5f", 0);
@@ -74,6 +76,7 @@ namespace imgui {
       float color[3] = {obj->color.x, obj->color.y, obj->color.z};
       ImGui::Text("EDIT QUAD");
       ImGui::ColorEdit3("COLOR:##", color, 1);
+      ImGui::SliderFloat("SPEED##", &obj->speed, 0, 5.0f, "%.5f", 0);
       ImGui::SliderFloat2("SIZE##", &obj->size.x, 0, 5.0f, "%.5f", 0);
       ImGui::SliderFloat2("POS:##", &obj->pos.x, -10, 10.0f, "%.5f", 0);
       ImGui::SliderFloat("ANGLE:##", &obj->angle, 0, 90.0f, "%.10f", 0);

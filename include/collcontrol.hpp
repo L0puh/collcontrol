@@ -245,6 +245,7 @@ class Object {
       glm::vec3 pos, size, color, rotation_pos;
       glm::vec2 center   = {0.0f, 0.0f};
       glm::vec2 velocity = {1.0f, 1.0f};
+      float speed = 2.0f;
       float radius = 0.25f;
 
 
@@ -315,17 +316,21 @@ class Renderer {
 
 
 namespace collision {
+   
    struct collider_rect { glm::vec2 ru, lu, ld, rd; };
    struct collider_triag{ glm::vec2 ru, rt, lt; };
+   struct collision_t { bool is_collide; glm::vec2 direction;}; 
+  
    bool point_is_inside(glm::vec2 pos, Object &obj);
    collider_triag get_collider_triag(Object &obj);
    collider_rect get_collider_rect(Object &obj);
    
    bool rect_rect(Object &x, Object &y);
-   bool circle_circle(Object &x, Object &y);
-   bool circle_rect(Object &c, Object &r);
+   collision_t circle_circle(Object &x, Object &y);
+   collision_t circle_rect(Object &c, Object &r);
    bool rect_triag(Object &r, Object &t);
    bool resolve_boundaries(Object *obj);
+   void resolve_collisions(Object *x, Object *y);
 };
 
 namespace imgui {
