@@ -323,9 +323,9 @@ namespace collision {
   
    bool point_is_inside(glm::vec2 pos, Object &obj);
    collider_triag get_collider_triag(Object &obj);
-   collider_rect get_collider_rect(Object &obj);
+   collider_rect  get_collider_rect(Object &obj);
    
-   bool rect_rect(Object &x, Object &y);
+   collision_t rect_rect(Object &x, Object &y);
    collision_t circle_circle(Object &x, Object &y);
    collision_t circle_rect(Object &c, Object &r);
    bool rect_triag(Object &r, Object &t);

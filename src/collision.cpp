@@ -74,17 +74,6 @@ namespace collision {
       return {up, rt, lt};
    }
 
-   bool rect_rect(Object &x, Object &y){
-      collider_rect a, b; 
-      
-      a = get_collider_rect(x), 
-      b = get_collider_rect(y);
-     
-      return  a.ld.x <= b.ru.x &&
-              a.ru.x >= b.ld.x &&
-              a.ld.y <= b.ru.y &&
-              a.ru.y >= b.ld.y;
-   }
 
    bool convex(Object &x, Object &y){
       return 0;
@@ -95,12 +84,12 @@ namespace collision {
       
       w = state.camera->get_window_size();
       screen = state.camera->unproject(obj->pos);
-      size = obj->size / 2.0f;
+      size = obj->size;
 
-      if (screen.x - size.x <= 0 || screen.x + size.x >= w.x ){ 
+      if (screen.x - size.x < 0 || screen.x + size.x > w.x ){ 
          obj->velocity.x *= -1;
       }
-      if (screen.y - size.y <= 0 || screen.y + size.y >= w.y) {
+      if (screen.y - size.y < 0 || screen.y + size.y > w.y) {
          obj->velocity.y *= -1;
       }
       return (screen.x - size.x <= 0 || screen.x + size.x >= w.x ||
@@ -135,6 +124,9 @@ namespace collision {
       }
       if(x->shape->type == circle && y->shape->type == rectangle){
          coll = circle_rect(*x, *y);
+      }
+      if(x->shape->type == rectangle && y->shape->type == rectangle){
+         coll = rect_rect(*x, *y);
       }
       if (coll.is_collide){
          x->velocity = coll.direction;
@@ -183,6 +175,25 @@ namespace collision {
             dir = {cos(angle), sin(angle)};
          }
       }
+      return {is_collide, dir};
+   }
+   collision_t rect_rect(Object &x, Object &y){
+      bool is_collide;
+      collider_rect a, b; 
+      glm::vec2 v, dir;
+      
+      a = get_collider_rect(x), 
+      b = get_collider_rect(y);
+     
+      is_collide = a.ld.x <= b.ru.x &&
+                 a.ru.x >= b.ld.x &&
+                 a.ld.y <= b.ru.y &&
+                 a.ru.y >= b.ld.y;
+      if (is_collide) {
+         v = x.pos - y.pos;
+         if (glm::length(v) > 0) 
+            dir = glm::normalize(v);
+         }
       return {is_collide, dir};
    }
       
