@@ -1,5 +1,4 @@
 #include "collcontrol.hpp"
-#include "glm/ext/quaternion_geometric.hpp"
 
 namespace collision {
    bool point_is_inside(glm::vec2 p, Object &obj){
@@ -96,20 +95,6 @@ namespace collision {
               screen.y - size.y <= 0 || screen.y + size.y >= w.y);
    }
 
-   bool rect_triag(Object &r, Object &t){
-      collider_rect a;
-      collider_triag b; 
-      
-      a = get_collider_rect(r), 
-      b = get_collider_triag(t);
-    
-      // FIXME:
-      return  a.ld.x <= b.ru.x &&
-              a.ru.x >= b.lt.x &&
-              a.ld.y <= b.ru.y &&
-              a.ru.y >= b.lt.y;
-   }
-
    void resolve_collisions(Object *x, Object *y){
       collision_t coll;
       if (x->shape->type == circle && y->shape->type == circle){
@@ -120,7 +105,7 @@ namespace collision {
          }
       }
       if (x->shape->type == rectangle && y->shape->type == circle){
-         coll = circle_rect(*x, *y);
+         coll = circle_rect(*y, *x);
       }
       if(x->shape->type == circle && y->shape->type == rectangle){
          coll = circle_rect(*x, *y);
@@ -128,6 +113,24 @@ namespace collision {
       if(x->shape->type == rectangle && y->shape->type == rectangle){
          coll = rect_rect(*x, *y);
       }
+     
+      if(x->shape->type == triangle && y->shape->type == rectangle){
+         coll = rect_triag(*y, *x);
+         if (coll.is_collide){
+            x->velocity = glm::normalize(x->velocity - coll.direction);
+            y->velocity = glm::normalize(y->velocity + coll.direction);
+         }
+         return;
+      }
+      if(x->shape->type == rectangle && y->shape->type == triangle){
+         coll = rect_triag(*x, *y);
+         if (coll.is_collide){
+            x->velocity = glm::normalize(x->velocity - coll.direction);
+            y->velocity = glm::normalize(y->velocity + coll.direction);
+         }
+         return;
+      }
+      
       if (coll.is_collide){
          x->velocity = coll.direction;
          y->velocity = -coll.direction;
@@ -195,6 +198,66 @@ namespace collision {
             dir = glm::normalize(v);
          }
       return {is_collide, dir};
+   }
+
+   bool intersect(glm::vec2 a, glm::vec2 b, glm::vec2 c, glm::vec2 d){
+      /* two line segments intersect */
+      float det, t, u;
+      
+       det = (b.x - a.x) * (d.y - c.y) - (b.y - a.y) * (d.x - c.x);
+       if (det == 0) return false; 
+
+       t = ((c.x - a.x) * (d.y - c.y) - (c.y - a.y) * (d.x - c.x)) / det;
+       u = -((a.x - c.x) * (b.y - a.y) - (a.y - c.y) * (b.x - a.x)) / det;
+
+       return (t > 0 && t < 1 && u > 0 && u < 1);
+   }
+
+   collision_t rect_triag(Object &r, Object &t){
+      /* FIXME: works, but needs debuging*/
+      collider_rect rect;
+      collider_triag tri; 
+
+      glm::vec2 dir;
+      
+      tri = get_collider_triag(t);
+      rect = get_collider_rect(r);
+
+      glm::vec2 rect_edges[4][2] = {
+         {rect.ld, rect.lu},
+         {rect.lu, rect.ru},
+         {rect.ru, rect.rd},
+         {rect.rd, rect.ld}
+      };
+
+      glm::vec2 tri_edges[3][2] = {
+         {tri.lt, tri.rt},
+         {tri.rt, tri.ru},
+         {tri.ru, tri.lt}
+      };
+
+    for (int i = 0; i < 4; ++i) 
+        for (int j = 0; j < 3; ++j) 
+            if (intersect(rect_edges[i][0], rect_edges[i][1], 
+                          tri_edges[j][0], tri_edges[j][1])) 
+            {
+               dir.y = rect_edges[i][1].x - rect_edges[i][0].x;
+               dir.x = rect_edges[i][1].y - rect_edges[i][0].y;
+               return {true, glm::normalize(dir)}; 
+            }
+
+    for (int i = 0; i < 3; ++i) 
+        for (int j = 0; j < 4; ++j) 
+            if (intersect(tri_edges[i][0], tri_edges[i][1], 
+                           rect_edges[j][0], rect_edges[j][1])) 
+            {
+               dir.y = tri_edges[i][1].x - tri_edges[i][0].x;
+               dir.x = tri_edges[i][1].y - tri_edges[i][0].y;
+               return {true, glm::normalize(dir)}; 
+            }
+         
+      return {false, dir};
+      
    }
       
 };
