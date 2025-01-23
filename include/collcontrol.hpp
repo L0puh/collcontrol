@@ -329,9 +329,12 @@ namespace collision {
    collision_t circle_circle(Object &x, Object &y);
    collision_t circle_rect(Object &c, Object &r);
    collision_t rect_triag(Object &r, Object &t);
+   collision_t triag_circle(Object &t, Object &c);
+
    bool resolve_boundaries(Object *obj);
    void resolve_collisions(Object *x, Object *y);
    bool intersect(glm::vec2 a, glm::vec2 b, glm::vec2 c, glm::vec2 d);
+   glm::vec2 closest_point_segment(glm::vec2 &p, glm::vec2 &a, glm::vec2 &b);
 };
 
 namespace imgui {

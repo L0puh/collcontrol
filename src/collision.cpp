@@ -1,3 +1,6 @@
+#include "glm/geometric.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/norm.hpp>
 #include "collcontrol.hpp"
 
 namespace collision {
@@ -106,6 +109,12 @@ namespace collision {
       }
       if (x->shape->type == rectangle && y->shape->type == circle){
          coll = circle_rect(*y, *x);
+      }
+      if(x->shape->type == circle && y->shape->type == triangle){
+         coll = triag_circle(*y, *x);
+      }
+      if(x->shape->type == triangle && y->shape->type == circle){
+         coll = triag_circle(*x, *y);
       }
       if(x->shape->type == circle && y->shape->type == rectangle){
          coll = circle_rect(*x, *y);
@@ -259,5 +268,39 @@ namespace collision {
       return {false, dir};
       
    }
+
+   glm::vec2 closest_point_segment(glm::vec2 &p, glm::vec2 &a, glm::vec2 &b)
+   {
+      float proj;
+      glm::vec2 ap, ab;
+      ap = p-a, ab = b-a;
+
+      proj = glm::dot(ap, ab) / glm::dot(ab, ab);
+      proj = glm::clamp(proj, 0.0f, 1.0f);
+      return a + proj * ab;
+   }
+   collision_t triag_circle(Object &t, Object &c){
+      glm::vec2 closest;
+      collider_triag tri;
+
+      tri = get_collider_triag(t);
+      glm::vec2 tri_edges[3][2] = {
+         {tri.lt, tri.rt},
+         {tri.rt, tri.ru},
+         {tri.ru, tri.lt}
+      };
       
+      if (point_is_inside(c.center, t)){
+         return {true, glm::normalize(c.center - tri.lt)};
+      }
+      for (int i = 0; i < 3; i++){
+         closest = closest_point_segment(c.center, tri_edges[i][0], tri_edges[i][1]);
+         if (glm::distance(c.center, closest) <= c.size.y/2.5f){
+            return {true, glm::normalize(c.center - closest)};
+         }
+
+      }
+      return {false, {}};
+
+   }
 };
