@@ -1,7 +1,5 @@
-#include "glm/geometric.hpp"
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/norm.hpp>
 #include "collcontrol.hpp"
+#include "glm/geometric.hpp"
 
 namespace collision {
    bool point_is_inside(glm::vec2 p, Object &obj){
@@ -125,19 +123,9 @@ namespace collision {
      
       if(x->shape->type == triangle && y->shape->type == rectangle){
          coll = rect_triag(*y, *x);
-         if (coll.is_collide){
-            x->velocity = glm::normalize(x->velocity - coll.direction);
-            y->velocity = glm::normalize(y->velocity + coll.direction);
-         }
-         return;
       }
       if(x->shape->type == rectangle && y->shape->type == triangle){
          coll = rect_triag(*x, *y);
-         if (coll.is_collide){
-            x->velocity = glm::normalize(x->velocity - coll.direction);
-            y->velocity = glm::normalize(y->velocity + coll.direction);
-         }
-         return;
       }
       
       if (coll.is_collide){
@@ -223,50 +211,32 @@ namespace collision {
    }
 
    collision_t rect_triag(Object &r, Object &t){
-      /* FIXME: works, but needs debuging*/
-      collider_rect rect;
-      collider_triag tri; 
+      collider_rect rc; collider_triag tc;
+     
+      rc = get_collider_rect(r); 
+      tc = get_collider_triag(t); 
 
-      glm::vec2 dir;
-      
-      tri = get_collider_triag(t);
-      rect = get_collider_rect(r);
-
-      glm::vec2 rect_edges[4][2] = {
-         {rect.ld, rect.lu},
-         {rect.lu, rect.ru},
-         {rect.ru, rect.rd},
-         {rect.rd, rect.ld}
+      glm::vec2 pr[4][2] = {
+         {rc.ld, rc.lu},
+         {rc.lu, rc.ru},
+         {rc.ru, rc.rd},
+         {rc.rd, rc.ld}
+      };
+      glm::vec2 tp[4][2] = {
+         {tc.ru, tc.lt},
+         {tc.lt, tc.rt},
+         {tc.rt, tc.ru},
       };
 
-      glm::vec2 tri_edges[3][2] = {
-         {tri.lt, tri.rt},
-         {tri.rt, tri.ru},
-         {tri.ru, tri.lt}
-      };
-
-    for (int i = 0; i < 4; ++i) 
-        for (int j = 0; j < 3; ++j) 
-            if (intersect(rect_edges[i][0], rect_edges[i][1], 
-                          tri_edges[j][0], tri_edges[j][1])) 
-            {
-               dir.y = rect_edges[i][1].x - rect_edges[i][0].x;
-               dir.x = rect_edges[i][1].y - rect_edges[i][0].y;
-               return {true, glm::normalize(dir)}; 
+      for (int i = 0; i < 4; i++){
+         for (int j = 0; j < 3; j++){
+            if (intersect(pr[i][0], pr[i][1], tp[j][0], tp[j][1])){
+               glm::vec2 dir = glm::vec2(pr[i] - tp[j]);
+               return {true, {glm::normalize(dir)}};
             }
-
-    for (int i = 0; i < 3; ++i) 
-        for (int j = 0; j < 4; ++j) 
-            if (intersect(tri_edges[i][0], tri_edges[i][1], 
-                           rect_edges[j][0], rect_edges[j][1])) 
-            {
-               dir.y = tri_edges[i][1].x - tri_edges[i][0].x;
-               dir.x = tri_edges[i][1].y - tri_edges[i][0].y;
-               return {true, glm::normalize(dir)}; 
-            }
-         
-      return {false, dir};
-      
+         }
+      }
+      return {false, {}};
    }
 
    glm::vec2 closest_point_segment(glm::vec2 &p, glm::vec2 &a, glm::vec2 &b)
@@ -276,11 +246,16 @@ namespace collision {
       ap = p-a, ab = b-a;
 
       proj = glm::dot(ap, ab) / glm::dot(ab, ab);
-      proj = glm::clamp(proj, 0.0f, 1.0f);
+      if (proj < 0.0f) return a;
+      if (proj > 1.0f) return b;
       return a + proj * ab;
+
    }
+
    collision_t triag_circle(Object &t, Object &c){
-      glm::vec2 closest;
+      /* FIXME!!!! (doesn't work properly....) */
+      float dx, dy, angle;
+      glm::vec2 closest, dir, p = c.pos;
       collider_triag tri;
 
       tri = get_collider_triag(t);
@@ -290,17 +265,13 @@ namespace collision {
          {tri.ru, tri.lt}
       };
       
-      if (point_is_inside(c.center, t)){
-         return {true, glm::normalize(c.center - tri.lt)};
-      }
       for (int i = 0; i < 3; i++){
-         closest = closest_point_segment(c.center, tri_edges[i][0], tri_edges[i][1]);
+         closest = closest_point_segment(p, tri_edges[i][0], tri_edges[i][1]);
          if (glm::distance(c.center, closest) <= c.size.y/2.5f){
-            return {true, glm::normalize(c.center - closest)};
+            return {true, glm::normalize(closest - p)};
          }
-
       }
-      return {false, {}};
+      return {false, dir};
 
    }
 };
