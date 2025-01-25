@@ -83,7 +83,8 @@ void Renderer::objects_loop(std::vector<Object> *objects){
          edit_object(&objects->at(i));
          drag_and_drop(&objects->at(i));
          collision::resolve_boundaries(&objects->at(i));
-         update_gravity(&objects->at(i));
+         if (state.global_state & GRAVITY)
+            update_gravity(&objects->at(i));
       }
 }
 

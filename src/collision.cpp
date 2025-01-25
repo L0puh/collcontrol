@@ -141,7 +141,7 @@ namespace collision {
       dx = x.pos.x - y.pos.x;
       dy = x.pos.y - y.pos.y;
       dist = (dx * dx) + (dy * dy);
-      smr = (x.size.x + y.size.x)/2.5f;
+      smr = (x.size.x + y.size.x)/2.f;
       
       is_collide = dist <= smr * smr;
       if (is_collide) {
@@ -166,7 +166,7 @@ namespace collision {
       closest.y = (closest.y > a.ru.y) ? a.ru.y: closest.y;
       
       dist = glm::distance(glm::vec2(c.pos), closest);
-      is_collide = dist <= c.size.y / 2.5f;
+      is_collide = dist <= c.size.y / 2.f;
       if (is_collide){
          dx = c.pos.x - closest.x;
          dy = c.pos.y - closest.y;
@@ -267,7 +267,7 @@ namespace collision {
       
       for (int i = 0; i < 3; i++){
          closest = closest_point_segment(p, tri_edges[i][0], tri_edges[i][1]);
-         if (glm::distance(c.center, closest) <= c.size.y/2.5f){
+         if (glm::distance(c.center, closest) <= c.size.y/2.f){
             return {true, glm::normalize(closest - p)};
          }
       }

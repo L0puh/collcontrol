@@ -25,6 +25,7 @@ namespace imgui {
    }
    void draw_main(){
       bool is_move = state.camera->flags & CAMERA_MOVE;
+      bool is_gravity = state.global_state & GRAVITY;
       ImGui::Begin("main", 0, ImGuiWindowFlags_AlwaysAutoResize);
 
       {
@@ -34,9 +35,13 @@ namespace imgui {
          ImGui::Text("MOUSE COORDS: %.6f %.6f", mouse_pos.x, mouse_pos.y);
          ImGui::ColorEdit4("BG COLOR:", state.bg_color, 0);
          ImGui::Checkbox("MOVE CAMERA:", &is_move);
+         ImGui::Checkbox("GRAVITY TOGGLE:", &is_gravity);
          ImGui::SliderFloat2("GRAVITY:", &state.renderer->gravity.x, 0, 5.0f, "%.5f", 0);
       }
       ImGui::End();
+
+      if (is_gravity) state.global_state |= GRAVITY;
+      else if (state.global_state & GRAVITY) state.global_state ^= GRAVITY;
       
       //it's a hack, FIXME later 
       if (is_move && !(state.camera->flags & CAMERA_MOVE)){
@@ -51,7 +56,7 @@ namespace imgui {
    void edit_circle(Object *obj){
       float color[3] = {obj->color.x, obj->color.y, obj->color.z};
       ImGui::Text("EDIT CIRCLE");
-      ImGui::SliderFloat("RADIUS##", &obj->radius, 0, 5.0f, "%.5f", 0);
+      ImGui::SliderFloat("RADIUS##", &obj->radius, 0.0, 1.0f, "%.8f", 0);
       ImGui::SliderFloat("SPEED##", &obj->speed, 0, 5.0f, "%.5f", 0);
       ImGui::SliderFloat2("SIZE##", &obj->size.x, 0, 5.0f, "%.5f", 0);
       ImGui::ColorEdit3("COLOR:##", color, 0);
@@ -82,6 +87,7 @@ namespace imgui {
       ImGui::SliderFloat("ANGLE:##", &obj->angle, 0, 90.0f, "%.10f", 0);
       obj->color = {color[0], color[1], color[2]};
    }
+
    void update_focused(){
       if (ImGui::IsWindowFocused() || ImGui::IsAnyItemFocused() ||
                             ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive()){

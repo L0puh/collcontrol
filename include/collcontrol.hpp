@@ -246,7 +246,7 @@ class Object {
       glm::vec2 center   = {0.0f, 0.0f};
       glm::vec2 velocity = {1.0f, 1.0f};
       float speed = 2.0f;
-      float radius = 0.25f;
+      float radius = glm::vec2(glm::normalize(size)/2.0f).y;
 
 
    public:
@@ -256,7 +256,7 @@ class Object {
    public:
       void set_pos(glm::vec3 pos) { this->pos = pos; }
       void set_size(glm::vec3 size) { 
-         this->radius = size.x * 0.25;
+         this->radius = glm::vec2(glm::normalize(size)/2.0f).y;
          this->size = size; 
       }
       void set_rotation(float angle, glm::vec3 pos) { 
