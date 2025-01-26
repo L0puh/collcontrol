@@ -1,5 +1,7 @@
 #include "collcontrol.hpp"
+#include "glm/ext/vector_float2.hpp"
 #include "glm/geometric.hpp"
+#include <limits>
 
 namespace collision {
    bool point_is_inside(glm::vec2 p, Object &obj){
@@ -100,16 +102,17 @@ namespace collision {
       collision_t coll;
       if (x->shape->type == circle && y->shape->type == circle){
          coll = circle_circle(*x, *y);
-         if (coll.is_collide){
-            x->velocity = coll.direction;
-            y->velocity = -coll.direction;
-         }
       }
       if (x->shape->type == rectangle && y->shape->type == circle){
          coll = circle_rect(*y, *x);
       }
       if(x->shape->type == circle && y->shape->type == triangle){
          coll = triag_circle(*y, *x);
+         if (coll.is_collide){
+            x->velocity = -coll.direction;
+            y->velocity = coll.direction;
+            return;
+         }
       }
       if(x->shape->type == triangle && y->shape->type == circle){
          coll = triag_circle(*x, *y);
@@ -120,14 +123,12 @@ namespace collision {
       if(x->shape->type == rectangle && y->shape->type == rectangle){
          coll = rect_rect(*x, *y);
       }
-     
       if(x->shape->type == triangle && y->shape->type == rectangle){
          coll = rect_triag(*y, *x);
       }
       if(x->shape->type == rectangle && y->shape->type == triangle){
          coll = rect_triag(*x, *y);
       }
-      
       if (coll.is_collide){
          x->velocity = coll.direction;
          y->velocity = -coll.direction;
@@ -223,11 +224,11 @@ namespace collision {
          {rc.rd, rc.ld}
       };
       glm::vec2 tp[4][2] = {
-         {tc.ru, tc.lt},
+         {tc.up, tc.lt},
          {tc.lt, tc.rt},
-         {tc.rt, tc.ru},
+         {tc.rt, tc.up},
       };
-
+      
       for (int i = 0; i < 4; i++){
          for (int j = 0; j < 3; j++){
             if (intersect(pr[i][0], pr[i][1], tp[j][0], tp[j][1])){
@@ -239,7 +240,7 @@ namespace collision {
       return {false, {}};
    }
 
-   glm::vec2 closest_point_segment(glm::vec2 &p, glm::vec2 &a, glm::vec2 &b)
+   glm::vec2 closest_point_segment(glm::vec2 &p, glm::vec2 a, glm::vec2 b)
    {
       float proj;
       glm::vec2 ap, ab;
@@ -253,25 +254,35 @@ namespace collision {
    }
 
    collision_t triag_circle(Object &t, Object &c){
-      /* FIXME!!!! (doesn't work properly....) */
-      float dx, dy, angle;
-      glm::vec2 closest, dir, p = c.pos;
-      collider_triag tri;
-
-      tri = get_collider_triag(t);
-      glm::vec2 tri_edges[3][2] = {
-         {tri.lt, tri.rt},
-         {tri.rt, tri.ru},
-         {tri.ru, tri.lt}
-      };
+      float mdist;
+      collider_triag tc;
+      tc = get_collider_triag(t);
       
-      for (int i = 0; i < 3; i++){
-         closest = closest_point_segment(p, tri_edges[i][0], tri_edges[i][1]);
-         if (glm::distance(c.center, closest) <= c.size.y/2.f){
-            return {true, glm::normalize(closest - p)};
+      glm::vec2 closest_point, closest_seg, p, dir;
+      glm::vec2 vertc[] = {tc.up, tc.lt, tc.rt};
+      glm::vec2 edges[][2] = {{tc.up, tc.lt}, {tc.lt, tc.rt}, {tc.rt, tc.up}};
+      
+      p = c.pos;
+
+      mdist = std::numeric_limits<float>::infinity();
+      for (const auto& v: vertc){
+         float d = glm::distance(p, v);
+         if (d < mdist) {
+            mdist = d;
+            closest_point = v;
          }
       }
-      return {false, dir};
+      for (const auto& edge : edges) {
+          closest_seg = closest_point_segment(p, edge[0], edge[1]);
+          float d = glm::distance(p, closest_seg);
+          if (d < mdist) {
+              mdist = d;
+              closest_point = closest_seg;
+          }
+       }
 
+      bool is_collide = mdist <= c.size.x/2.f;
+      dir = glm::normalize(closest_point - p);
+      return {is_collide, dir};
    }
 };

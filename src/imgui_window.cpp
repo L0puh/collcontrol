@@ -43,7 +43,6 @@ namespace imgui {
       if (is_gravity) state.global_state |= GRAVITY;
       else if (state.global_state & GRAVITY) state.global_state ^= GRAVITY;
       
-      //it's a hack, FIXME later 
       if (is_move && !(state.camera->flags & CAMERA_MOVE)){
          state.camera->set_flag(CAMERA_MOVE|CAMERA_CHANGED);
       } else if (!is_move && state.camera->flags & CAMERA_MOVE) {
