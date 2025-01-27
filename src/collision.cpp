@@ -105,6 +105,14 @@ namespace collision {
       }
       if (x->shape->type == rectangle && y->shape->type == circle){
          coll = circle_rect(*y, *x);
+         if (coll.is_collide){
+            x->velocity = -coll.direction;
+            y->velocity = coll.direction;
+            return;
+         }
+      }
+      if(x->shape->type == circle && y->shape->type == rectangle){
+         coll = circle_rect(*x, *y);
       }
       if(x->shape->type == circle && y->shape->type == triangle){
          coll = triag_circle(*y, *x);
@@ -117,9 +125,6 @@ namespace collision {
       if(x->shape->type == triangle && y->shape->type == circle){
          coll = triag_circle(*x, *y);
       }
-      if(x->shape->type == circle && y->shape->type == rectangle){
-         coll = circle_rect(*x, *y);
-      }
       if(x->shape->type == rectangle && y->shape->type == rectangle){
          coll = rect_rect(*x, *y);
       }
@@ -128,6 +133,9 @@ namespace collision {
       }
       if(x->shape->type == rectangle && y->shape->type == triangle){
          coll = rect_triag(*x, *y);
+      }
+      if(x->shape->type == triangle && y->shape->type == triangle){
+         coll = triag_traig(*x, *y);
       }
       if (coll.is_collide){
          x->velocity = coll.direction;
@@ -252,6 +260,35 @@ namespace collision {
       return a + proj * ab;
 
    }
+   
+   collision_t triag_traig(Object &t, Object &t2){
+      collider_triag a,b; 
+     
+      a = get_collider_triag(t2); 
+      b = get_collider_triag(t); 
+
+      glm::vec2 bp[4][2] = {
+         {a.up, a.lt},
+         {a.lt, a.rt},
+         {a.rt, a.up},
+      };
+      glm::vec2 ap[4][2] = {
+         {b.up, b.lt},
+         {b.lt, b.rt},
+         {b.rt, b.up},
+      };
+      
+      for (int i = 0; i < 3; i++){
+         for (int j = 0; j < 3; j++){
+            if (intersect(bp[i][0], bp[i][1], ap[j][0], ap[j][1])){
+               glm::vec2 dir = glm::vec2(bp[i] - ap[j]);
+               return {true, {glm::normalize(dir)}};
+            }
+         }
+      }
+      return {false, {}};
+
+   }
 
    collision_t triag_circle(Object &t, Object &c){
       float mdist;
@@ -280,7 +317,6 @@ namespace collision {
               closest_point = closest_seg;
           }
        }
-
       bool is_collide = mdist <= c.size.x/2.f;
       dir = glm::normalize(closest_point - p);
       return {is_collide, dir};

@@ -330,6 +330,7 @@ namespace collision {
    collision_t circle_rect(Object &c, Object &r);
    collision_t rect_triag(Object &r, Object &t);
    collision_t triag_circle(Object &t, Object &c);
+   collision_t triag_traig(Object &t, Object &t2);
 
    bool resolve_boundaries(Object *obj);
    void resolve_collisions(Object *x, Object *y);
