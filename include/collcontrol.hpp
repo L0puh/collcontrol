@@ -28,6 +28,7 @@
 
 
 namespace color {
+   const GLfloat bg[]     = {0.1f, 0.1f, 0.1f, 1.0f};
    const GLfloat blue[]   = {0.0f, 0.0f, 1.0f, 1.0f};
    const GLfloat red[]    = {1.0f, 0.0f, 0.0f, 1.0f};
    const GLfloat white[]  = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -239,7 +240,10 @@ class Object {
       uint8_t flags;
       Shader *shader;
       Shape  *shape;
-     
+      std::vector<GLfloat const*> colors = { color::blue, color::red,
+                                             color::green, color::white, 
+                                             color::yellow };
+        
       float angle = 0.0f;
       glm::mat4 model, view, proj;
       glm::vec3 pos, size, color, rotation_pos;
@@ -271,6 +275,7 @@ class Object {
       }
       void update() { model = glm::mat4(1.0f); }
       void draw(glm::mat4 proj, glm::mat4 view);
+      void set_random_color();
 
 
    private: 

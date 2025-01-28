@@ -26,4 +26,20 @@ void Object::draw(glm::mat4 proj, glm::mat4 view) {
    shader->unuse();
 }
 
-
+void Object::set_random_color(){
+   int seed, num;
+   seed = static_cast<int>(state.deltatime * 1000000); 
+   num = (seed * 1103515245 + 12345) % colors.size();
+   
+   printf("%d\n", seed);
+   set_color(colors.at(num));
+}
+void Object::scale(glm::vec3 scaler){
+   model = glm::scale(model, scaler);
+}
+void Object::translate(glm::vec3 pos){
+   model = glm::translate(model, pos);
+}
+void Object::rotate(float angle, glm::vec3 pos){
+   model = glm::rotate(model, angle, pos);
+}

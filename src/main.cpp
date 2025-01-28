@@ -12,8 +12,8 @@ int main() {
    Renderer renderer(&camera, window);
    
    camera.set_flag(CAMERA_FIXED); 
-   memcpy(state.bg_color, color::blue, 
-         sizeof(color::blue));
+   memcpy(state.bg_color, color::bg, 
+         sizeof(color::bg));
 
    Shape rect(shape_type::rectangle), 
          triag(shape_type::triangle), 
@@ -27,6 +27,7 @@ int main() {
    renderer.add_shape(&triag);
    renderer.add_shape(&circle);
    renderer.set_objects(&objects);
+
    while (!glfwWindowShouldClose(window)){
       renderer.update();
       renderer.objects_loop(&objects);   

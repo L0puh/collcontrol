@@ -127,12 +127,3 @@ const int Shader::get_location(std::string name){
 
 
 
-void Object::scale(glm::vec3 scaler){
-   model = glm::scale(model, scaler);
-}
-void Object::translate(glm::vec3 pos){
-   model = glm::translate(model, pos);
-}
-void Object::rotate(float angle, glm::vec3 pos){
-   model = glm::rotate(model, angle, pos);
-}
