@@ -36,7 +36,8 @@ namespace imgui {
          ImGui::ColorEdit4("BG COLOR:", state.bg_color, 0);
          ImGui::Checkbox("MOVE CAMERA:", &is_move);
          ImGui::Checkbox("GRAVITY TOGGLE:", &is_gravity);
-         ImGui::SliderFloat2("GRAVITY:", &state.renderer->gravity.x, 0, 5.0f, "%.5f", 0);
+         ImGui::SliderFloat2("GRAVITY:", &state.renderer->gravity.x, -10.f, 10.0f, "%.5f", 0);
+         ImGui::SliderFloat("OFFSET:", &state.camera->offset, 0, 10.0f, "%.5f", 0);
       }
       ImGui::End();
 
@@ -61,6 +62,7 @@ namespace imgui {
       ImGui::ColorEdit3("COLOR:##", color, 0);
       ImGui::SliderFloat2("POS:##", &obj->pos.x, -10, 10.0f, "%.5f", 0);
       ImGui::SliderFloat2("CENTER POS:##", &obj->center.y, -1.0f, 1.0f, "%.9f", 0);
+      ImGui::SliderFloat("MASS:##", &obj->mass, 0, 90.0f, "%.10f", 0);
       obj->color = {color[0], color[1], color[2]};
    }
    void edit_object(Object *obj){
@@ -84,6 +86,7 @@ namespace imgui {
       ImGui::SliderFloat2("SIZE##", &obj->size.x, 0, 5.0f, "%.5f", 0);
       ImGui::SliderFloat2("POS:##", &obj->pos.x, -10, 10.0f, "%.5f", 0);
       ImGui::SliderFloat("ANGLE:##", &obj->angle, 0, 90.0f, "%.10f", 0);
+      ImGui::SliderFloat("MASS:##", &obj->mass, 0, 90.0f, "%.10f", 0);
       obj->color = {color[0], color[1], color[2]};
    }
 

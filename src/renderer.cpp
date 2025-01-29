@@ -98,8 +98,10 @@ void Renderer::draw_line(glm::vec3 p0, glm::vec3 p1, const GLfloat *color, GLflo
       
 }
 void Renderer::update_gravity(Object *obj){
-   obj->velocity += gravity * state.deltatime;
+   obj->force += obj->mass * gravity;
+   obj->velocity += obj->force / obj->mass * state.deltatime;
    obj->pos += glm::vec3(obj->velocity * obj->speed * state.deltatime, 0.0f);
+   obj->force = glm::vec2(0.0f);
 }
 
 void Renderer::drag_and_drop(Object *obj){

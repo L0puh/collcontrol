@@ -83,19 +83,19 @@ namespace collision {
 
    bool resolve_boundaries(Object *obj){
       glm::vec2 screen, size, w;
-      
+      float offset = state.camera->offset; 
       w = state.camera->get_window_size();
       screen = state.camera->unproject(obj->pos);
       size = obj->size;
 
-      if (screen.x - size.x < 0 || screen.x + size.x > w.x ){ 
+      if (screen.x - size.x <= offset || screen.x + size.x >= w.x ){ 
          obj->velocity.x *= -1;
       }
-      if (screen.y - size.y < 0 || screen.y + size.y > w.y) {
+      if (screen.y - size.y <= offset || screen.y + size.y >= w.y) {
          obj->velocity.y *= -1;
       }
-      return (screen.x - size.x <= 0 || screen.x + size.x >= w.x ||
-              screen.y - size.y <= 0 || screen.y + size.y >= w.y);
+      return (screen.x - size.x <= offset || screen.x + size.x >= w.x ||
+              screen.y - size.y <= offset || screen.y + size.y >= w.y);
    }
 
    void resolve_collisions(Object *x, Object *y){

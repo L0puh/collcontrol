@@ -197,6 +197,7 @@ class Shape {
 class Camera {
    public:
       GLFWwindow* window;
+      float offset = 1.5f;
       uint8_t flags;
       glm::mat4 view;
       glm::vec3 pos; 
@@ -245,10 +246,11 @@ class Object {
                                              color::yellow };
         
       float angle = 0.0f;
+      float mass = 10.0f;
       glm::mat4 model, view, proj;
       glm::vec3 pos, size, color, rotation_pos;
       glm::vec2 center   = {0.0f, 0.0f};
-      glm::vec2 velocity = {1.0f, 1.0f};
+      glm::vec2 velocity = {1.0f, 1.0f}, force = {0.0f, 0.0f};
       float speed = 2.0f;
       float radius = glm::vec2(glm::normalize(size)/2.0f).y;
 
