@@ -27,12 +27,14 @@ void Object::draw(glm::mat4 proj, glm::mat4 view) {
 }
 
 void Object::set_random_color(){
-   int seed, num;
-   seed = static_cast<int>(state.deltatime * 1000000); 
-   num = (seed * 1103515245 + 12345) % colors.size();
-   
-   printf("%d\n", seed);
+   int num = get_random_number(0, colors.size()); 
    set_color(colors.at(num));
+}
+
+void Object::set_random_size(){
+   float sz = get_random_number(1.0f, 3.0f);
+   printf("%.3f\n", sz);
+   set_size({sz, sz, 0.0f});
 }
 void Object::scale(glm::vec3 scaler){
    model = glm::scale(model, scaler);

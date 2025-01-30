@@ -262,7 +262,7 @@ class Object {
    public:
       void set_pos(glm::vec3 pos) { this->pos = pos; }
       void set_size(glm::vec3 size) { 
-         this->radius = glm::vec2(glm::normalize(size)/2.0f).y;
+         this->radius = size.y * 0.15;
          this->size = size; 
       }
       void set_rotation(float angle, glm::vec3 pos) { 
@@ -278,6 +278,7 @@ class Object {
       void update() { model = glm::mat4(1.0f); }
       void draw(glm::mat4 proj, glm::mat4 view);
       void set_random_color();
+      void set_random_size();
 
 
    private: 
@@ -326,7 +327,8 @@ namespace collision {
    
    struct collider_rect { glm::vec2 ru, lu, ld, rd; };
    struct collider_triag{ glm::vec2 up, rt, lt; };
-   struct collision_t { bool is_collide; glm::vec2 direction;}; 
+   struct collision_t { bool is_collide; glm::vec2 direction; 
+                  float depth = -std::numeric_limits<float>::infinity();}; 
   
    bool point_is_inside(glm::vec2 pos, Object &obj);
    collider_triag get_collider_triag(Object &obj);
@@ -365,4 +367,22 @@ void update_deltatime();
 GLFWwindow* init_window(int width, int height);
 void check_collisions(std::vector<Object> *objects);
 
+inline int get_random_number(int from, int to){
+   int seed, num;
+   seed = static_cast<int>(state.deltatime * 1000000); 
+   num = (seed * 1103515245 + 12345) % (to-from);
+   if (num < from) num = from;
+   return num + from;
+}
+
+inline float get_random_number(float from, float to){
+   int seed;
+   float num;
+   
+   seed = static_cast<int>(state.deltatime * 1000000);
+   num = (seed * 1103515245 + 12345) % (int)((to - from) * 1000000);
+   num = from + num / 1000000.0f;
+   if (num < from) num = from;
+   return num;
+}
 #endif 
