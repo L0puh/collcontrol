@@ -32,8 +32,7 @@ void Object::set_random_color(){
 }
 
 void Object::set_random_size(){
-   float sz = get_random_number(1.0f, 3.0f);
-   printf("%.3f\n", sz);
+   float sz = get_random_number(1.0f, 2.0f);
    set_size({sz, sz, 0.0f});
 }
 void Object::scale(glm::vec3 scaler){

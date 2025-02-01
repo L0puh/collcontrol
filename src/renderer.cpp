@@ -1,4 +1,5 @@
 #include "collcontrol.hpp"
+#include <limits>
 
 void Renderer::update() {
    glClearBufferfv(GL_COLOR, 0, state.bg_color);   
@@ -31,9 +32,18 @@ void Renderer::create_new_object(shape_type type, glm::vec2 pos){
 
 void check_collisions(std::vector<Object> *objects){
    for(int i = 0; i < objects->size(); i++){
+      int y = -1;
+      collision::collision_t coll, mxcoll = {false};
+      mxcoll = collision::collision_with_world(&objects->at(i));
+      mxcoll.depth = mxcoll.is_collide ? 1.0f: -std::numeric_limits<float>::infinity();
       for(int j = i+1; j < objects->size(); j++){
-         collision::resolve_collisions(&objects->at(j), &objects->at(i));
+         coll = collision::detect_collision(&objects->at(j), &objects->at(i));
+         if (coll.is_collide && coll.depth > mxcoll.depth){
+            mxcoll = coll;
+            y = j;
+         }
       }
+      collision::resolve_collision(&objects->at(i), y != -1 ? &objects->at(y): NULL, mxcoll);
    }
 }
 
@@ -82,7 +92,6 @@ void Renderer::objects_loop(std::vector<Object> *objects){
          if (delete_object(&objects->at(i))) break;
          edit_object(&objects->at(i));
          drag_and_drop(&objects->at(i));
-         collision::resolve_boundaries(&objects->at(i));
          if (state.global_state & GRAVITY)
             update_gravity(&objects->at(i));
       }
@@ -98,10 +107,8 @@ void Renderer::draw_line(glm::vec3 p0, glm::vec3 p1, const GLfloat *color, GLflo
       
 }
 void Renderer::update_gravity(Object *obj){
-   obj->force += obj->mass * gravity;
-   obj->velocity += obj->force / obj->mass * state.deltatime;
-   obj->pos += glm::vec3(obj->velocity * obj->speed * state.deltatime, 0.0f);
-   obj->force = glm::vec2(0.0f);
+   obj->velocity += gravity * state.deltatime;
+   obj->pos += glm::vec3(obj->velocity * state.deltatime * obj->speed, 0.0f);
 }
 
 void Renderer::drag_and_drop(Object *obj){

@@ -1,6 +1,7 @@
 #include "collcontrol.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/geometric.hpp"
+#include "state.hpp"
 #include <limits>
 
 namespace collision {
@@ -81,46 +82,40 @@ namespace collision {
       return 0;
    }
 
-   bool resolve_boundaries(Object *obj){
+   collision_t collision_with_world(Object *obj){
       glm::vec2 screen, size, w;
+      collision_t coll;
       float offset = state.camera->offset; 
       w = state.camera->get_window_size();
       screen = state.camera->unproject(obj->pos);
       size = obj->size;
 
-      if (screen.x - size.x <= offset || screen.x + size.x >= w.x ){ 
-         obj->velocity.x *= -1;
-      }
-      if (screen.y - size.y <= offset || screen.y + size.y >= w.y) {
-         obj->velocity.y *= -1;
-      }
-      return (screen.x - size.x <= offset || screen.x + size.x >= w.x ||
-              screen.y - size.y <= offset || screen.y + size.y >= w.y);
+      if (screen.x - size.x <= offset)
+         coll.direction = {-1, 0};
+      if(screen.x + size.x >= w.x )
+         coll.direction = {+1, 0};
+      if (screen.y - size.y <= offset) 
+         coll.direction = {0, -1};
+      if (screen.y + size.y >= w.y)
+         coll.direction = {0, +1};
+      coll.is_collide = (screen.x - size.x <= offset || screen.x + size.x >= w.x ||
+                         screen.y - size.y <= offset || screen.y + size.y >= w.y);
+      return coll;
    }
 
-   void resolve_collisions(Object *x, Object *y){
+   collision_t detect_collision(Object *x, Object *y){
       collision_t coll;
       if (x->shape->type == circle && y->shape->type == circle){
          coll = circle_circle(*x, *y);
       }
       if (x->shape->type == rectangle && y->shape->type == circle){
          coll = circle_rect(*y, *x);
-         if (coll.is_collide){
-            x->velocity = -coll.direction;
-            y->velocity = coll.direction;
-            return;
-         }
       }
       if(x->shape->type == circle && y->shape->type == rectangle){
          coll = circle_rect(*x, *y);
       }
       if(x->shape->type == circle && y->shape->type == triangle){
          coll = triag_circle(*y, *x);
-         if (coll.is_collide){
-            x->velocity = -coll.direction;
-            y->velocity = coll.direction;
-            return;
-         }
       }
       if(x->shape->type == triangle && y->shape->type == circle){
          coll = triag_circle(*x, *y);
@@ -137,28 +132,30 @@ namespace collision {
       if(x->shape->type == triangle && y->shape->type == triangle){
          coll = triag_traig(*x, *y);
       }
-      if (coll.is_collide){
-         x->velocity = coll.direction;
-         y->velocity = -coll.direction;
+
+      return coll;
+   }
+
+   void resolve_collision(Object *x, Object *y, collision_t c){
+      glm::vec2 move;
+      if (c.is_collide && (state.global_state & GRAVITY)){
+         move = c.direction * (c.depth/2.0f);
+         x->velocity += move;
+         if ( y != NULL)
+            y->velocity -= move;
       }
    }
    collision_t circle_circle(Object &x, Object &y){
-      bool is_collide;
-      glm::vec2 direction;
-      float dx, dy, dist, smr, angle;
-      
-      dx = x.pos.x - y.pos.x;
-      dy = x.pos.y - y.pos.y;
-      dist = (dx * dx) + (dy * dy);
-      smr = (x.size.x + y.size.x)/2.f;
-      
-      is_collide = dist <= smr * smr;
-      if (is_collide) {
-         angle = atan2(dy, dx);
-         direction.x = cos(angle);
-         direction.y = sin(angle);
-       } 
-      return {is_collide, direction};
+      float depth, dist, rd;
+      glm::vec2 delta, normal;
+
+      delta = x.pos - y.pos;
+      dist = length(delta);
+      rd = (x.size.x + y.size.x)/2.0f;
+      normal = delta/dist;
+      depth = rd - dist;
+
+      return {depth > 0.0f, normal, depth };
    }
 
    collision_t circle_rect(Object &c, Object &r){

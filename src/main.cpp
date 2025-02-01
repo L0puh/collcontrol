@@ -30,8 +30,8 @@ int main() {
 
    while (!glfwWindowShouldClose(window)){
       renderer.update();
-      renderer.objects_loop(&objects);   
       check_collisions(&objects);
+      renderer.objects_loop(&objects);   
       renderer.render(&objects);
    }
    
