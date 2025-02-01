@@ -140,6 +140,7 @@ namespace collision {
       glm::vec2 move;
       if (c.is_collide && (state.global_state & GRAVITY)){
          move = c.direction * (c.depth/2.0f);
+         // move = c.direction;
          x->velocity += move;
          if ( y != NULL)
             y->velocity -= move;
@@ -155,14 +156,14 @@ namespace collision {
       normal = delta/dist;
       depth = rd - dist;
 
-      return {depth > 0.0f, normal, depth };
+      return {depth > 0.0f, normal, depth};
    }
 
    collision_t circle_rect(Object &c, Object &r){
       bool is_collide;
       collider_rect a;
-      float dist, dx, dy, angle;
-      glm::vec2 closest = c.pos, dir;
+      float dist;
+      glm::vec2 closest = c.pos, dir, p = c.pos;
 
       a = get_collider_rect(r);
       closest.x = (closest.x < a.ld.x) ? a.ld.x: closest.x;
@@ -174,14 +175,9 @@ namespace collision {
       dist = glm::distance(glm::vec2(c.pos), closest);
       is_collide = dist <= c.size.y / 2.f;
       if (is_collide){
-         dx = c.pos.x - closest.x;
-         dy = c.pos.y - closest.y;
-         if (dx != 0 || dy != 0){
-            angle = atan2(dy, dx);
-            dir = {cos(angle), sin(angle)};
-         }
+         dir = glm::vec2(p-closest) / dist;
       }
-      return {is_collide, dir};
+      return {is_collide, glm::normalize(dir), 1.0f};
    }
    collision_t rect_rect(Object &x, Object &y){
       bool is_collide;
@@ -200,7 +196,7 @@ namespace collision {
          if (glm::length(v) > 0) 
             dir = glm::normalize(v);
          }
-      return {is_collide, dir};
+      return {is_collide, dir, 1.0f};
    }
 
    bool intersect(glm::vec2 a, glm::vec2 b, glm::vec2 c, glm::vec2 d){
@@ -279,7 +275,7 @@ namespace collision {
          for (int j = 0; j < 3; j++){
             if (intersect(bp[i][0], bp[i][1], ap[j][0], ap[j][1])){
                glm::vec2 dir = glm::vec2(bp[i] - ap[j]);
-               return {true, {glm::normalize(dir)}};
+               return {true, {glm::normalize(dir)}, 1.0f};
             }
          }
       }
@@ -316,6 +312,6 @@ namespace collision {
        }
       bool is_collide = mdist <= c.size.x/2.f;
       dir = glm::normalize(closest_point - p);
-      return {is_collide, dir};
+      return {is_collide, dir, 1.0f};
    }
-};
+}; 
