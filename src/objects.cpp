@@ -41,6 +41,9 @@ void Object::scale(glm::vec3 scaler){
 void Object::translate(glm::vec3 pos){
    model = glm::translate(model, pos);
 }
+void Object::translate(glm::vec2 pos){
+   model = glm::translate(model, glm::vec3(pos, 0.0f));
+}
 void Object::rotate(float angle, glm::vec3 pos){
    model = glm::rotate(model, angle, pos);
 }

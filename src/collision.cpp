@@ -55,7 +55,7 @@ namespace collision {
    }
    collider_rect get_collider_rect(Object &obj){
       glm::vec2 ru, lu, ld, rd;
-      glm::vec3 sz = obj.size, pos = obj.pos;
+      glm::vec2 sz = obj.size, pos = obj.pos;
 
       ld = {pos.x - sz.x/2.0f, pos.y - sz.y/2.0f};
       ru = {pos.x + sz.x/2.0f, pos.y + sz.y/2.0f};
@@ -68,7 +68,7 @@ namespace collision {
    collider_triag get_collider_triag(Object &obj){
       float d, l, u, r;
       glm::vec2 up, rt, lt;
-      glm::vec3 pos = obj.pos, sz = obj.size;
+      glm::vec2 pos = obj.pos, sz = obj.size;
 
       up = {pos.x, pos.y + sz.y / 2.0f};
       lt = {pos.x - sz.x / 2.0f, pos.y - sz.y / 2.0f};
@@ -83,24 +83,38 @@ namespace collision {
    }
 
    collision_t collision_with_world(Object *obj){
-      glm::vec2 screen, size, w;
-      collision_t coll;
-      float offset = state.camera->offset; 
-      w = state.camera->get_window_size();
-      screen = state.camera->unproject(obj->pos);
-      size = obj->size;
+       collision_t coll;
+       glm::vec2 screen, size, w;
+       float offset = state.camera->offset;
+      
+       w = state.camera->get_window_size();
+       screen = state.camera->unproject(obj->pos);
+       size = obj->size;
 
-      if (screen.x - size.x <= offset)
-         coll.direction = {-1, 0};
-      if(screen.x + size.x >= w.x )
-         coll.direction = {+1, 0};
-      if (screen.y - size.y <= offset) 
-         coll.direction = {0, -1};
-      if (screen.y + size.y >= w.y)
-         coll.direction = {0, +1};
-      coll.is_collide = (screen.x - size.x <= offset || screen.x + size.x >= w.x ||
-                         screen.y - size.y <= offset || screen.y + size.y >= w.y);
-      return coll;
+       coll.direction = glm::vec2(0.0f);
+       coll.is_collide = false;
+
+       if (screen.x - size.x <= offset) {
+           coll.direction.x -= 1;
+           coll.is_collide = true;
+       }
+       if (screen.x + size.x >= w.x) {
+           coll.direction.x += 1;
+           coll.is_collide = true;
+       }
+       if (screen.y - size.y <= offset) {
+           coll.direction.y -= 1;
+           coll.is_collide = true;
+       }
+       if (screen.y + size.y >= w.y) {
+           coll.direction.y += 1; 
+           coll.is_collide = true;
+       }
+
+       if (coll.is_collide) 
+           coll.direction = glm::normalize(coll.direction); 
+
+       return coll;
    }
 
    collision_t detect_collision(Object *x, Object *y){
@@ -110,9 +124,11 @@ namespace collision {
       }
       if (x->shape->type == rectangle && y->shape->type == circle){
          coll = circle_rect(*y, *x);
+         coll.direction *= -1;
       }
       if(x->shape->type == circle && y->shape->type == rectangle){
          coll = circle_rect(*x, *y);
+
       }
       if(x->shape->type == circle && y->shape->type == triangle){
          coll = triag_circle(*y, *x);
@@ -137,33 +153,34 @@ namespace collision {
    }
 
    void resolve_collision(Object *x, Object *y, collision_t c){
-      glm::vec2 move;
-      if (c.is_collide && (state.global_state & GRAVITY)){
-         move = c.direction * (c.depth/2.0f);
-         // move = c.direction;
-         x->velocity += move;
-         if ( y != NULL)
-            y->velocity -= move;
-      }
+       float restitution = 0.5f, imp;
+       imp = glm::dot(c.direction, x->velocity);
+       if (c.is_collide && (state.global_state & GRAVITY)) {
+          if (imp > 0.0f) return;
+          x->velocity -= (1.0f + restitution) * imp * c.direction;
+         if (y != NULL)
+            y->velocity += (1.0f + restitution) * imp * c.direction;
+       }
    }
    collision_t circle_circle(Object &x, Object &y){
+
       float depth, dist, rd;
       glm::vec2 delta, normal;
 
-      delta = x.pos - y.pos;
+      delta = y.pos - x.pos;
       dist = length(delta);
-      rd = (x.size.x + y.size.x)/2.0f;
-      normal = delta/dist;
+      rd = (x.size.x + y.size.x)/2.f;
+      normal = glm::normalize(delta);
       depth = rd - dist;
-
       return {depth > 0.0f, normal, depth};
+
    }
 
    collision_t circle_rect(Object &c, Object &r){
       bool is_collide;
       collider_rect a;
       float dist;
-      glm::vec2 closest = c.pos, dir, p = c.pos;
+      glm::vec2 closest = c.pos, p = c.pos, dir;
 
       a = get_collider_rect(r);
       closest.x = (closest.x < a.ld.x) ? a.ld.x: closest.x;
@@ -173,12 +190,11 @@ namespace collision {
       closest.y = (closest.y > a.ru.y) ? a.ru.y: closest.y;
       
       dist = glm::distance(glm::vec2(c.pos), closest);
-      is_collide = dist <= c.size.y / 2.f;
-      if (is_collide){
-         dir = glm::vec2(p-closest) / dist;
-      }
+      is_collide = dist <= c.size.y/2.0f;
+      if (is_collide) dir = closest - p;
       return {is_collide, glm::normalize(dir), 1.0f};
    }
+
    collision_t rect_rect(Object &x, Object &y){
       bool is_collide;
       collider_rect a, b; 
@@ -192,7 +208,7 @@ namespace collision {
                  a.ld.y <= b.ru.y &&
                  a.ru.y >= b.ld.y;
       if (is_collide) {
-         v = x.pos - y.pos;
+         v = y.pos - x.pos;
          if (glm::length(v) > 0) 
             dir = glm::normalize(v);
          }

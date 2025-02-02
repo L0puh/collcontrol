@@ -241,6 +241,7 @@ class Object {
       uint8_t flags;
       Shader *shader;
       Shape  *shape;
+      bool is_static = false;
       std::vector<GLfloat const*> colors = { color::blue, color::red,
                                              color::green, color::white, 
                                              color::yellow };
@@ -248,9 +249,9 @@ class Object {
       float angle = 0.0f;
       float mass = 10.0f;
       glm::mat4 model, view, proj;
-      glm::vec3 pos, size, color, rotation_pos;
+      glm::vec3 size, color, rotation_pos;
       glm::vec2 center   = {0.0f, 0.0f};
-      glm::vec2 velocity = {1.0f, 1.0f}, force = {0.0f, 0.0f};
+      glm::vec2 velocity = {1.0f, 1.0f}, force = glm::vec2(0.0f), pos;
       float speed = 2.0f;
       float radius = glm::vec2(glm::normalize(size)/2.0f).y;
 
@@ -284,6 +285,7 @@ class Object {
    private: 
       void scale(glm::vec3 scaler);
       void translate(glm::vec3 pos);
+      void translate(glm::vec2 pos);
       void rotate(float angle, glm::vec3 pos);
 
 };
@@ -297,7 +299,7 @@ class Renderer {
    std::vector<Object> *objects;
   
    public:
-      glm::vec2 gravity = {0.0f, 0.0f};
+      glm::vec2 gravity = {0.0f, 0.9f};
 
    public:
       Renderer(Camera *cam, GLFWwindow *win): 
