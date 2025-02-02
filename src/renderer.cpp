@@ -1,5 +1,8 @@
 #include "collcontrol.hpp"
+#include "glm/detail/qualifier.hpp"
+#include "glm/ext/quaternion_geometric.hpp"
 #include <limits>
+#include <stdexcept>
 
 void Renderer::update() {
    glClearBufferfv(GL_COLOR, 0, state.bg_color);   
@@ -110,26 +113,26 @@ void Renderer::update_gravity(Object *obj){
 
    if (obj->is_static || glm::length(obj->velocity) < 0.1f) return;
    obj->velocity += gravity * state.deltatime;
-   obj->pos += obj->velocity * state.deltatime;
-
+   obj->pos      += obj->velocity * state.deltatime * obj->speed;
    obj->force = glm::vec2(0.0f);
 
 }
 
 void Renderer::drag_and_drop(Object *obj){
    bool is_inside;
-   glm::vec2 campos; 
+   glm::vec2 cam_pos; 
    
-   campos = camera->get_mouse_pos();
+   cam_pos = camera->get_mouse_pos();
    is_inside = collision::point_is_inside(camera->get_mouse_pos(), *obj);
    if (is_inside && (state.global_state & MOUSE_CLICKED) && (state.global_state
                & MOUSE_CHANGED) && !(state.global_state & IMGUI_FOCUSED)){
-      last_pos = { campos.x - obj->pos.x, campos.y - obj->pos.y};
+      last_pos = { cam_pos.x - obj->pos.x, cam_pos.y - obj->pos.y};
       state.current_dragged_id = obj->id;
       state.global_state ^= MOUSE_CHANGED;
    } 
    if ((state.global_state & MOUSE_CLICKED) && !(state.global_state & IMGUI_FOCUSED) && state.current_dragged_id == obj->id){
-      obj->set_pos(glm::vec3((campos.x - last_pos.x), (campos.y - last_pos.y), 0.0f));
+      obj->velocity = glm::vec2(1.0f);
+      obj->set_pos(glm::vec3((cam_pos.x - last_pos.x), (cam_pos.y - last_pos.y), 0.0f));
    } 
    if (!(state.global_state & MOUSE_CLICKED) && state.current_dragged_id != -1) 
       state.current_dragged_id = -1;

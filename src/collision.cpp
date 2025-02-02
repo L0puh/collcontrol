@@ -154,26 +154,30 @@ namespace collision {
 
    void resolve_collision(Object *x, Object *y, collision_t c){
        float restitution = 0.5f, imp;
-       imp = glm::dot(c.direction, x->velocity);
+       imp = glm::dot(c.direction,  (y != NULL ? y->velocity: glm::vec2(0.0f)) + x->velocity);
        if (c.is_collide && (state.global_state & GRAVITY)) {
-          if (imp > 0.0f) return;
-          x->velocity -= (1.0f + restitution) * imp * c.direction;
-         if (y != NULL)
-            y->velocity += (1.0f + restitution) * imp * c.direction;
+          if (imp <= 0.0f){
+             x->velocity -= (1.0f + restitution) * imp * c.direction;
+          }
+          if (glm::length(x->velocity) < 0.1f) x->velocity = glm::vec2(1.0f);
+          if (y != NULL) {
+             y->velocity -= (1.0f + restitution) * imp * c.direction;
+          }
        }
    }
+
    collision_t circle_circle(Object &x, Object &y){
+      bool is_collide;
+      glm::vec2 direction;
+      float dx, dy, dist, smr, angle;
 
-      float depth, dist, rd;
-      glm::vec2 delta, normal;
+      dx = x.pos.x - y.pos.x;
+      dy = x.pos.y - y.pos.y;
+      dist = (dx * dx) + (dy * dy);
+      smr = (x.size.x + y.size.x)/2.f;
 
-      delta = y.pos - x.pos;
-      dist = length(delta);
-      rd = (x.size.x + y.size.x)/2.f;
-      normal = glm::normalize(delta);
-      depth = rd - dist;
-      return {depth > 0.0f, normal, depth};
-
+      is_collide = dist <= smr * smr;
+      return {is_collide, glm::normalize(y.pos - x.pos), dist - smr * smr};
    }
 
    collision_t circle_rect(Object &c, Object &r){
